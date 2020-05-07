@@ -11,3 +11,17 @@ export const getLocationData = async () => {
     })
     return response.json();
 }
+
+
+export const setLocation = async (body) => {
+    const url = `${endpoint}/setLocationData`;
+    const response = await fetch(url,{
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body)
+    })
+    return response.json()
+}

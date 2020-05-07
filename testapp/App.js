@@ -7,7 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions'
 import Constants from 'expo-constants'
 import BigButton from './BigButton'
-import { getLocationData, uploadImage } from './api'
+import { getLocationData, uploadImage, setLocation } from './api'
 
 class App extends Component{
 
@@ -18,22 +18,35 @@ class App extends Component{
     test: false,
     cameraStatus: null,
     imageMarker: [],
-    image: ""
   }
   coordinate = []
   PositionWatcher = null;
   
 
+  mapData = (data) => data.message.cords.map(ele=>({
+    coords:{
+    latitude: ele.latitude,
+    longitude: ele.longitude,
+    latitudeDelta: 0.0922, 
+    longitudeDelta: 0.0421,
+  },
+  uri: `https://39e01457.ngrok.io/images/${ele.image}`
+  }))
+
   onRegionChange = (mapRegion)=>{
     const data = {
       coords : mapRegion
     }
-    this.calculateCordinated(data)
+    this.state.test && this.calculateCordinated(data)
     this.setState({ mapRegion })
   }
 
   async componentDidMount() {
+    
     const data = await getLocationData()
+    const formatedData = this.mapData(data)
+    await Image.prefetch('https://39e01457.ngrok.io/images/1588849004468.jpg')
+    this.setState({ imageMarker: formatedData })
     return this.getCurrentPosition()
 }
 
@@ -56,15 +69,19 @@ _pickImage = async () => {
     exif: true
   });
   if (!result.cancelled) {
-    console.log({ result })
-    const data = await this.uploadImageAsync(result.base64, result.exif.ImageUniqueID)    
-    console.log({ data })
-    this.setState({ image: result.uri });
+    const filename = `${new Date().valueOf()}`
+    await this.uploadImageAsync(result.base64, filename)    
     const { mapRegion, imageMarker } = this.state
-    console.log({ state: this.state })
+    await setLocation({
+      point: {
+        latitude: mapRegion.latitude, 
+        longitude: mapRegion.longitude,
+        image: `${filename}.jpg`
+      }
+    })
     imageMarker.push({
       coords: mapRegion,
-      src: `${result.uri}`
+      uri: `https://39e01457.ngrok.io/images/${filename}.jpg`
     })
     this.setState({ imageMarker })
   }
@@ -116,7 +133,8 @@ calculateCordinated = (res) => {
       latitude: res.coords.latitude,
       longitude: res.coords.longitude,
       latitudeDelta: 0.0922, 
-      longitudeDelta: 0.0421
+      longitudeDelta: 0.0421,
+      image: ''
     })
   }
   this.setState({ ...newState ,mapRegion: { latitude: res.coords.latitude, longitude: res.coords.longitude, latitudeDelta: 0.0922, longitudeDelta: 0.0421 }, timestamp: new Date().valueOf() })
@@ -131,7 +149,6 @@ getLocationAsync = async (userId) => {
         });
     } else {
         this.setState({ hasLocationPermissions: true })
-
         this.PositionWatcher = Location.watchPositionAsync({
           accuracy: 6,
           timeInterval: 2500
@@ -154,48 +171,29 @@ getLocationAsync = async (userId) => {
 
   openCamera = async ()=>{
     const { status } = await Camera.requestPermissionsAsync();
-    console.log(status)
     this.setState({ cameraStatus: status })
   }
 
   render(){
     const { mapRegion, customMarker, test, imageMarker } = this.state
-    console.log({ imageMarker })
   return (
     <SafeAreaView style={{ flex: 1 }} >
       {
         mapRegion ? 
       <MapView
         initialRegion={this.coordinate[0]}
-        onRegionChange={ (data)=> test && this.onRegionChange(data)}
+        onRegionChange={ (data)=> this.onRegionChange(data)}
         style={{ flex: 0.65 }}
       >
-        {/* <Marker
-          coordinate={this.coordinate[0]}
-        >
-          <Callout>
-            <View style={{ width: 50, height: 30 }} >
-              <Text>Hello</Text>
-            </View>
-          </Callout>
-        </Marker > */}
-        <Marker
-            coordinate={this.coordinate[0]}
-          >
-            <Callout style={{  }} >
-              <Text style={{height: 300, width: 200, marginTop: -95 }} >
-                <Image style={{ height: 200, width: 200 }} resizeMode ={"contain"} source={{ uri: this.state.image}}  />
-              </Text>
-            </Callout>
-          </Marker >
         {
           imageMarker.length ?
-          imageMarker.map(ele=><Marker
+          imageMarker.map((ele, index)=><Marker
+            key={index.toString()}
             coordinate={ele.coords}
           >
             <Callout style={{ flex: -1}} >
-              <Text>
-                <Image style={{ height: 100, width: 100 }} resizeMode="cover" source={{ uri: this.state.image}}  />
+              <Text style={{ flexDirection: 'column',  marginTop: -95 }} >
+                <Image style={{ height: 200, width: 200 }} resizeMode="contain" source={{ uri: ele.uri}} onLoadStart={()=>console.log("start")} onLoadEnd={()=>{ console.log('loaded') }}  />
               </Text>
             </Callout>
           </Marker >)

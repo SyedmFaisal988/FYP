@@ -11,8 +11,7 @@ export const uploadImage = async (body) => {
             },
             body: JSON.stringify(body)
         })
-        console.log({ response })
-        return response.json();
+        return 
     }
    catch(err){
        console.log(err)

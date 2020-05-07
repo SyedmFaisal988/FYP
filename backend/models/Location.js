@@ -10,6 +10,10 @@ const CordsSchema = new Schema({
         type: Number,
         required: true
     },
+    image: {
+        type: String,
+        required: false
+    }
 })
 
 const Location = new Schema({
