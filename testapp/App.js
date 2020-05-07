@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, SafeAreaView } from 'react-native';
-import MapView, { Marker, Polyline } from 'react-native-maps';
+import { StyleSheet, View, SafeAreaView, Text, Image } from 'react-native';
+import MapView, { Marker, Polyline, Callout } from 'react-native-maps';
 import * as Location from 'expo-location'
+import * as ImagePicker from 'expo-image-picker';
+// import ImagePicker from 'react-native-image-picker';
 import * as Permissions from 'expo-permissions'
+import Constants from 'expo-constants'
 import BigButton from './BigButton'
+import { getLocationData, uploadImage } from './api'
 
 class App extends Component{
 
@@ -11,15 +15,14 @@ class App extends Component{
     mapRegion: null,
     customMarker: [],
     timestamp: new Date().valueOf(),
-    test: false
+    test: false,
+    cameraStatus: null,
+    imageMarker: [],
+    image: ""
   }
-  coordinate = [{
-    latitude: 24.9399878,
-    longitude: 67.0315282,
-    latitudeDelta: 0.0922, 
-    longitudeDelta: 0.0421,
-  }]
+  coordinate = []
   PositionWatcher = null;
+  
 
   onRegionChange = (mapRegion)=>{
     const data = {
@@ -29,8 +32,52 @@ class App extends Component{
     this.setState({ mapRegion })
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    const data = await getLocationData()
     return this.getCurrentPosition()
+}
+
+getPermissionAsync = async () => {
+  if (Constants.platform.ios) {
+    const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    if (status !== 'granted') {
+      alert('Sorry, we need camera roll permissions to make this work!');
+    }
+  }
+}
+
+_pickImage = async () => {
+  let result = await ImagePicker.launchCameraAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.All,
+    allowsEditing: true,
+    aspect: [4, 3],
+    quality: 1,
+    base64: true
+  });
+  if (!result.cancelled) {
+    const resporse = await fetch(result.uri)
+    const blob = await resporse.blob()
+    await this.uploadImageAsync(blob)
+    // const src = DOMURL.createObjectURL( blob );
+    console.log({ blob })
+    console.log({ result })
+    this.setState({ image: result.uri });
+    const { mapRegion, imageMarker } = this.state
+    console.log({ state: this.state })
+    imageMarker.push({
+      coords: mapRegion,
+      src: `${result.uri}`
+    })
+    this.setState({ imageMarker })
+  }
+}
+
+
+uploadImageAsync(blob) {
+  let formData = new FormData();
+  // formData.append('photo', blob, blob._data.name);
+
+  return uploadImage({blob: blob._data})
 }
 
 getCurrentPosition = async () => {
@@ -45,7 +92,11 @@ getCurrentPosition = async () => {
         Location.getCurrentPositionAsync({
           accuracy: 6,
       }).then((res) => {
-        console.log({ res })
+        this.coordinate.push({
+          latitude: res.coords.latitude,
+          longitude: res.coords.longitude,
+          latitudeDelta: 0.0922, 
+          longitudeDelta: 0.0421, })
           this.setState({ mapRegion: {
             latitude: res.coords.latitude,
             longitude: res.coords.longitude,
@@ -57,8 +108,8 @@ getCurrentPosition = async () => {
 
 calculateCordinated = (res) => {
   const { mapRegion, timestamp, test } = this.state
+  const newState = this.state
   if(res.coords.latitude.toFixed(4)[6] !== this.coordinate[this.coordinate.length-1].latitude.toFixed(4)[6]){
-    const newState = this.state
     const date = new Date();
     const threshold = test ? 1000 : 1200000
     if( (date.valueOf() - timestamp) >= threshold){
@@ -72,8 +123,8 @@ calculateCordinated = (res) => {
       latitudeDelta: 0.0922, 
       longitudeDelta: 0.0421
     })
-    this.setState({ ...newState ,mapRegion: { latitude: res.coords.latitude, longitude: res.coords.longitude, latitudeDelta: 0.0922, longitudeDelta: 0.0421 }, timestamp: new Date().valueOf() })
   }
+  this.setState({ ...newState ,mapRegion: { latitude: res.coords.latitude, longitude: res.coords.longitude, latitudeDelta: 0.0922, longitudeDelta: 0.0421 }, timestamp: new Date().valueOf() })
 }
 
 getLocationAsync = async (userId) => {
@@ -90,7 +141,6 @@ getLocationAsync = async (userId) => {
           accuracy: 6,
           timeInterval: 2500
       }, (res) => {
-        console.log({ res })
           this.calculateCordinated(res);
       })
     }
@@ -102,26 +152,60 @@ getLocationAsync = async (userId) => {
     this.coordinate = [mapRegion]
     if(this.PositionWatcher)
       this.PositionWatcher.then(res=>{
-        console.log(res)
         res.remove()
       })
     this.setState({ customMarker: [], test: false,  })
   }
 
+  openCamera = async ()=>{
+    const { status } = await Camera.requestPermissionsAsync();
+    console.log(status)
+    this.setState({ cameraStatus: status })
+  }
+
   render(){
-    const { mapRegion, customMarker, test } = this.state
+    const { mapRegion, customMarker, test, imageMarker } = this.state
+    console.log({ imageMarker })
   return (
     <SafeAreaView style={{ flex: 1 }} >
       {
         mapRegion ? 
       <MapView
-        initialRegion={mapRegion}
+        initialRegion={this.coordinate[0]}
         onRegionChange={ (data)=> test && this.onRegionChange(data)}
-        style={{ flex: 0.7 }}
+        style={{ flex: 0.65 }}
       >
-        <Marker
+        {/* <Marker
           coordinate={this.coordinate[0]}
-        />
+        >
+          <Callout>
+            <View style={{ width: 50, height: 30 }} >
+              <Text>Hello</Text>
+            </View>
+          </Callout>
+        </Marker > */}
+        <Marker
+            coordinate={this.coordinate[0]}
+          >
+            <Callout style={{  }} >
+              <Text style={{height: 300, width: 200, marginTop: -95 }} >
+                <Image style={{ height: 200, width: 200 }} resizeMode ={"contain"} source={{ uri: this.state.image}}  />
+              </Text>
+            </Callout>
+          </Marker >
+        {
+          imageMarker.length ?
+          imageMarker.map(ele=><Marker
+            coordinate={ele.coords}
+          >
+            <Callout style={{ flex: -1}} >
+              <Text>
+                <Image style={{ height: 100, width: 100 }} resizeMode="cover" source={{ uri: this.state.image}}  />
+              </Text>
+            </Callout>
+          </Marker >)
+          : <></>
+        }
         {
           this.coordinate.length >= 2 ? 
           <Marker
@@ -136,13 +220,15 @@ getLocationAsync = async (userId) => {
       </MapView> :
       <></>
   }
-  { mapRegion ? <View style={{ flex: 0.25, justifyContent: "space-between", marginVertical: 20 }} >
+   <View style={{ flex: 0.3, justifyContent: "space-between", marginVertical: 20 }} >
     <BigButton text="Start" onPress={()=>this.getLocationAsync()} />
     <BigButton text="End"  onPress={()=> this.clearMap()} />
     <BigButton text="Start Test" onPress={()=> this.setState({ test: true })} />
-    </View> : <></> }
+    <BigButton text="Camera" onPress={()=>this._pickImage()} />
+    </View>
     </SafeAreaView>
-  )}
+  )
+}
 }
 
 const styles = StyleSheet.create({
