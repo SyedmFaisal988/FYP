@@ -1,1 +1,1 @@
-export const endpoint = 'https://39e01457.ngrok.io'
+export const endpoint = 'https://37c23eb4.ngrok.io'
