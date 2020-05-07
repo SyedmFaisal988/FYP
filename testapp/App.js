@@ -52,15 +52,13 @@ _pickImage = async () => {
     allowsEditing: true,
     aspect: [4, 3],
     quality: 1,
-    base64: true
+    base64: true,
+    exif: true
   });
   if (!result.cancelled) {
-    const resporse = await fetch(result.uri)
-    const blob = await resporse.blob()
-    await this.uploadImageAsync(blob)
-    // const src = DOMURL.createObjectURL( blob );
-    console.log({ blob })
     console.log({ result })
+    const data = await this.uploadImageAsync(result.base64, result.exif.ImageUniqueID)    
+    console.log({ data })
     this.setState({ image: result.uri });
     const { mapRegion, imageMarker } = this.state
     console.log({ state: this.state })
@@ -73,11 +71,8 @@ _pickImage = async () => {
 }
 
 
-uploadImageAsync(blob) {
-  let formData = new FormData();
-  // formData.append('photo', blob, blob._data.name);
-
-  return uploadImage({blob: blob._data})
+uploadImageAsync(blob, name) {
+  return uploadImage({blob: blob, name })
 }
 
 getCurrentPosition = async () => {

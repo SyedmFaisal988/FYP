@@ -3,46 +3,32 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const http = require("http");
-const multer = require('multer')
 const fs = require('fs')
 const locationModal = require("./models/Location");
-var FileReader = require('filereader')
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        console.log('aya')
-      cb(null, './images/'  )
-    }, filename: (req, file, cb)=> {
-      cb(null, file.originalname)
-    }
-  })
-  
-  const fileFilter = (req, file, cb)=> {
-    if(file.mimetype === 'image/jpg' )
-      return cb(null, true)
-    return cb(null, false)
-  }
-
-  const upload = multer({
-    storage,
-    // fileFilter
-  })
 
 const app = express();
 app.use(morgan("dev"));
-app.use(express.json());
+app.use('/images' ,express.static('images'))
+app.use(express.json({
+  limit: '50mb'
+}));
 app.use(cors());
 
 
 app.post('/uploads', async (req, res)=>{
-    const blob = req.body.blob
-    var reader= new FileReader();
-    reader.readAsBinaryString(blob); 
-    reader.onloadend = function() {
-        var base64data = reader.result;                
-        console.log(base64data);
-    }
-  })
+  const blob = req.body.blob
+  const name = req.body.name
+  var base64Data = blob.replace(/^data:image\/png;base64,/, "");
+
+fs.writeFile(`./images/${name}.png`, base64Data, 'base64', function(err) {
+  console.log(err);
+});
+res.json({
+  status: 'success',
+  message: `${name}.png`
+})
+})
+   
 
 app.use("/getLocationData", (req, res) => {
   try {
