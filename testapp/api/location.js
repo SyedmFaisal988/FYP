@@ -1,7 +1,8 @@
 import { endpoint } from '../constants'
 
 export const getLocationData = async () => {
-    const url = `${endpoint}/getLocationData`;
+    const url = `${endpoint}/location/getLocationData`;
+    console.log({url})
     const response = await fetch(url, {
         method: 'GET',
         headers:{
@@ -14,7 +15,7 @@ export const getLocationData = async () => {
 
 
 export const setLocation = async (body) => {
-    const url = `${endpoint}/setLocationData`;
+    const url = `${endpoint}/location/setLocationData`;
     const response = await fetch(url,{
         method: 'POST',
         headers: {

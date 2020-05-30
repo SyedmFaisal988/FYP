@@ -1,7 +1,7 @@
 import { endpoint } from '../constants'
 
 export const uploadImage = async (body) => {
-    const url = `${endpoint}/uploads`;
+    const url = `${endpoint}/location/uploads`;
     try{
         const response = await fetch(url, {
             method: 'POST',

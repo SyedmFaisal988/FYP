@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { StyleSheet, View, SafeAreaView, Text, Image } from "react-native";
+import {
+  StyleSheet,
+  View,
+  SafeAreaView,
+  Text,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import MapView, { Marker, Polyline, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
@@ -18,6 +25,7 @@ class App extends Component {
     test: false,
     cameraStatus: null,
     imageMarker: [],
+    loading: true,
   };
   coordinate = [];
   PositionWatcher = null;
@@ -50,7 +58,6 @@ class App extends Component {
       const base64data = fileReaderInstance.result;
       let imageMarker = JSON.parse(JSON.stringify(this.state.imageMarker));
       imageMarker[index].uri = base64data;
-      console.log("res");
       this.setState({ imageMarker });
     };
   };
@@ -83,6 +90,7 @@ class App extends Component {
       base64: true,
       exif: true,
     });
+    await this.setState({ loading: true })
     if (!result.cancelled) {
       const filename = `${new Date().valueOf()}`;
       await this.uploadImageAsync(result.base64, filename);
@@ -107,6 +115,7 @@ class App extends Component {
         this.setState({ imageMarker });
       };
     }
+    return this.setState({ loading: false })
   };
 
   uploadImageAsync(blob, name) {
@@ -119,6 +128,7 @@ class App extends Component {
       this.setState({
         locationResult: "Permission to access location was denied",
         userId,
+        loading: false
       });
     } else {
       this.setState({ hasLocationPermissions: true });
@@ -138,6 +148,7 @@ class App extends Component {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           },
+          loading: false
         });
       });
     }
@@ -215,8 +226,12 @@ class App extends Component {
   };
 
   render() {
-    const { mapRegion, customMarker, test, imageMarker } = this.state;
-    return (
+    const { mapRegion, customMarker, test, imageMarker, loading } = this.state;
+    return loading ? (
+      <View style={{ flex: 1, justifyContent: 'center', alignContent: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    ) : (
       <SafeAreaView style={{ flex: 1 }}>
         {mapRegion ? (
           <MapView
