@@ -42,4 +42,10 @@ userRouter.route('/login')
     })
 })
 
+userRouter.route('/check').get(authenticate.verifyUser, (req, res)=>{
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json')
+    res.json({ success: true })
+})
+
 module.exports = userRouter

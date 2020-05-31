@@ -1,2 +1,3 @@
 export * from './location'
 export * from './uploads'
+export * from './authentication'
