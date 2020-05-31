@@ -21,29 +21,28 @@ class Register extends Component {
 
     onRegister = async ()=>{
         await this.setState({ loading: true })
-        const { fullName, email, phone, password } = this.state
-        const response = await signup({ username: fullName, email, phoneNumber: phone, password })
+        const { fullName, email, password } = this.state
+        const response = await signup({ username: fullName, email, password })
         if(response.success){
             this.props.navigation.navigate('login')
             return this.setState({ loading: false })
         }else{
-            alert("Something went wrong")
+            alert(response.messag || "Something went wrong")
             return this.setState({ loading: false })
         }
     }
 
     validate = () => {
-        const { email, phone } = this.state
+        const { email } = this.state
         if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))) {
             return alert("You have entered an invalid email address!")
         }
-        if(phone[0] !== 9 || phone[1] !== 2 || phone[2] !== 9 || phone.length !== 12 )
-            return alert("You enter a invalid phone number")
         this.onRegister()
     }
 
     render() {
-        const { fullName, email, password, phone ,loading } = this.state;
+        console.log('register')
+        const { fullName, email, password ,loading } = this.state;
         return (
             <SafeAreaView style={{ flex: 1 }} >
                 <StatusBar backgroundColor="black" barStyle="light-content" />
@@ -73,9 +72,6 @@ class Register extends Component {
                             </InputField>
                             <InputField placeholder={"Email"} value={email} onChange={(value)=>this.setState({email: value})} >
                                 <Envalop />
-                            </InputField>
-                            <InputField placeholder={"Phone Number"} value={phone} onChange={(value)=>this.setState({phone: value})} >
-                                <Phone />
                             </InputField>
                             <InputField placeholder={"Password"} value={password} onChange={(value)=>this.setState({password: value})} >
                                 <Password />

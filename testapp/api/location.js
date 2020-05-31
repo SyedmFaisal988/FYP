@@ -1,28 +1,17 @@
 import { endpoint } from '../constants'
+import { setHeader } from '../utils/setHeader'
 
 export const getLocationData = async () => {
     const url = `${endpoint}/location/getLocationData`;
-    console.log({url})
-    const response = await fetch(url, {
-        method: 'GET',
-        headers:{
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-        },
-    })
+    const headers = await setHeader("GET")
+    const response = await fetch(url, headers)
     return response.json();
 }
 
 
 export const setLocation = async (body) => {
     const url = `${endpoint}/location/setLocationData`;
-    const response = await fetch(url,{
-        method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body)
-    })
+    const headers = await setHeader('POST', body)
+    const response = await fetch(url,headers)
     return response.json()
 }

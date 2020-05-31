@@ -6,7 +6,7 @@ import Start from './start'
 
 const AuthLoading = createStackNavigator({
     unAuthorizeNavigator,
-    
+    authorizeNavigator,
     Start
 }, {
     initialRouteName: "Start",

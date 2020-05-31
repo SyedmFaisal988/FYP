@@ -1,5 +1,6 @@
 const express = require('express');
 const authenticate = require('../authenticate')
+const locationModal = require('../models/Location')
 const fs = require("fs");
 
 const locationRouter = express.Router()

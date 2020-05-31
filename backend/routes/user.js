@@ -8,13 +8,14 @@ userRouter.use(express.json())
 
 
 userRouter.route('/signup').post(async (req, res)=>{
+    console.log('hit')
     const { body: { username, password, email } } = req
     try {
         const user = await User.findOne({ email });
         if(user){
             res.statusCode = 400
             res.setHeader('Content-Type', 'application/json')
-            return res.json({ message: `${email} is already in use` })
+            return res.json({ message: `${email} is already in use`, success: false })
         }else{
             await User.register(new User({
                 username,
@@ -22,14 +23,14 @@ userRouter.route('/signup').post(async (req, res)=>{
             }), password)
             res.statusCode = 200
             res.setHeader('Content-Type', 'application/json')
-            res.json({ message: 'signup successful' })
+            res.json({ message: 'signup successful', success: true })
         }
     }
     catch(err){
         console.log(err)
         res.statusCode = 500
         res.setHeader('Content-Type', 'application/json')
-        return res.json({ message: 'Something went wrong' })
+        return res.json({ message: 'Something went wrong', success: false })
     }
 })
 

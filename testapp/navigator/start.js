@@ -13,6 +13,7 @@ export default Start = (props) => {
                 const response = await check()
                 console.log('res',response)
                 if (response.success) {
+                    console.log('yaham')
                     const resetAction = StackActions.reset({
                         index: 0,
                         actions: [NavigationActions.navigate({ routeName: "authorizeNavigator" })],
@@ -20,6 +21,7 @@ export default Start = (props) => {
                     return props.navigation.dispatch(resetAction)
                 }
             }
+           
             const resetAction = StackActions.reset({
                 index: 0,
                 actions: [NavigationActions.navigate({ routeName: "unAuthorizeNavigator" })],
@@ -27,7 +29,7 @@ export default Start = (props) => {
             return props.navigation.dispatch(resetAction)
         })
         .catch(err => {
-            console.log(err)
+            console.log(err, 'err')
             const resetAction = StackActions.reset({
                 index: 0,
                 actions: [NavigationActions.navigate({ routeName: "unAuthorizeNavigator" })],

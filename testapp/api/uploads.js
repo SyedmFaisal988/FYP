@@ -1,16 +1,11 @@
 import { endpoint } from '../constants'
+import { setHeader } from '../utils/setHeader'
 
 export const uploadImage = async (body) => {
     const url = `${endpoint}/location/uploads`;
+    const headers = await setHeader('POST', body)
     try{
-        const response = await fetch(url, {
-            method: 'POST',
-            headers:{
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body)
-        })
+        const response = await fetch(url, headers)
         return 
     }
    catch(err){

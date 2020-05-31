@@ -10,10 +10,10 @@ import {
 import MapView, { Marker, Polyline, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
-// import ImagePicker from 'react-native-image-picker';
 import * as Permissions from "expo-permissions";
 import Constants from "expo-constants";
 import BigButton from "../components/BigButton";
+import Loader from '../components/loader'
 import { getLocationData, uploadImage, setLocation } from "../api";
 import { endpoint } from "../constants";
 
@@ -29,6 +29,7 @@ class Maptracker extends Component {
     };
     coordinate = [];
     PositionWatcher = null;
+    navigationListener = null
   
     mapData = (data) =>
       data.message.cords.map((ele) => ({
@@ -62,14 +63,22 @@ class Maptracker extends Component {
       };
     };
   
-    async componentDidMount() {
-      const data = await getLocationData();
-      const formatedData = this.mapData(data);
-      this.setState({ imageMarker: formatedData });
-      formatedData.forEach((ele, index) => {
-        this.fetchImages(ele, index);
-      });
-      return this.getCurrentPosition();
+    componentDidMount() {
+      this.navigationListener = this.props.navigation.addListener('focus', async ()=>{
+        const data = await getLocationData();
+        const formatedData = this.mapData(data);
+        this.setState({ imageMarker: formatedData });
+        for(var i=0; i< formatedData.length; i++)
+        {
+          await this.fetchImages(formatedData[i], i);
+        };
+        await this.getCurrentPosition();
+        return this.setState({ loading: false })
+    })
+    }
+
+    componentWillUnmount(){
+      this.navigationListener()
     }
   
     getPermissionAsync = async () => {
@@ -128,7 +137,6 @@ class Maptracker extends Component {
         this.setState({
           locationResult: "Permission to access location was denied",
           userId,
-          loading: false
         });
       } else {
         this.setState({ hasLocationPermissions: true });
@@ -148,7 +156,6 @@ class Maptracker extends Component {
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421,
             },
-            loading: false
           });
         });
       }
@@ -227,17 +234,14 @@ class Maptracker extends Component {
   
     render() {
       const { mapRegion, customMarker, test, imageMarker, loading } = this.state;
-      return loading ? (
-        <View style={{ flex: 1, justifyContent: 'center', alignContent: 'center' }}>
-          <ActivityIndicator size="large" color="#0000ff" />
-        </View>
-      ) : (
+      return (
         <SafeAreaView style={{ flex: 1 }}>
+          <Loader loading={loading} />
           {mapRegion ? (
             <MapView
               initialRegion={this.coordinate[0]}
               onRegionChange={(data) => this.onRegionChange(data)}
-              style={{ flex: 0.65 }}
+              style={{ flex: 1 }}
             >
               {imageMarker.length ? (
                 imageMarker.map((ele, index) => (
@@ -274,21 +278,6 @@ class Maptracker extends Component {
           ) : (
             <></>
           )}
-          <View
-            style={{
-              flex: 0.3,
-              justifyContent: "space-between",
-              marginVertical: 20,
-            }}
-          >
-            <BigButton text="Start" onPress={() => this.getLocationAsync()} />
-            <BigButton text="End" onPress={() => this.clearMap()} />
-            <BigButton
-              text="Start Test"
-              onPress={() => this.setState({ test: true })}
-            />
-            <BigButton text="Camera" onPress={() => this._pickImage()} />
-          </View>
         </SafeAreaView>
       );
     }

@@ -29,7 +29,6 @@ const InputField = ({placeholder, value, onChange, children, secureTextEntry})=>
 
 const styles = StyleSheet.create({
     inputWrapper:{
-        // padding: 5,
         elevation: 5,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 0.5*5 },
@@ -38,6 +37,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row', 
         height: height*0.06,
         borderRadius: 70,
+        backgroundColor: "#fff"
     }
 })
 

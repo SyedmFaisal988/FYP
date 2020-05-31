@@ -21,8 +21,17 @@ const check = async ()=>{
     return response.json()
 }
 
-const signup = async () => {
-
+const signup = async (inputData) => {
+    const url = `${endpoint}/users/signup`
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputData)
+    })
+    return response.json()
 }
 
 export { logIn, check, signup }
