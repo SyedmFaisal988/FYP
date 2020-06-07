@@ -13,7 +13,7 @@ locationRouter.route("/uploads")
     const blob = req.body.blob;
     const name = req.body.name;
     var base64Data = blob.replace(/^data:image\/png;base64,/, "");
-  
+    console.log('uplo')
     fs.writeFile(`./images/${name}.jpg`, base64Data, "base64", function (err) {
       if (err) {
         res.statusCode = 500;
@@ -32,11 +32,13 @@ locationRouter.route("/uploads")
   
   locationRouter.route("/getLocationData",).get(authenticate.verifyUser, (req, res) => {
     try {
-      locationModal.findById('5eb3dbe988e34d69fc751470').then((resp) => {
+      locationModal.findOne({ userId: req.user._id }).then((resp) => {
         res.statusCode = 200;
         return res.json({
           status: true,
-          message: resp,
+          message: resp || {
+            cords: []
+          },
         });
       });
     } catch (err) {
@@ -52,7 +54,7 @@ locationRouter.route("/uploads")
   locationRouter.route("/setLocationData").post(authenticate.verifyUser, (req, res) => {
     const { body: { point } } = req
     console.log({ point })
-    locationModal.findByIdAndUpdate('5eb3dbe988e34d69fc751470', { $push: { 'cords': point } })
+    locationModal.findOneAndUpdate({ userId: req.user._id }, { $push: { 'cords': { ...point, created: new Date() } } })
       .then((resp) => {
         console.log({ success: "success" });
         res.json({

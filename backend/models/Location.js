@@ -13,11 +13,27 @@ const CordsSchema = new Schema({
     image: {
         type: String,
         required: false
+    },
+    processing: {
+        type: Date,
+        required: false
+    },
+    complete: {
+        type: Date,
+        required: false
+    },
+    created: {
+        type: Date,
+        required: false
     }
 })
 
 const Location = new Schema({
     cords: [CordsSchema],
+    userId: {
+        type: String,
+        required: true,
+    }
 },{
     timestamps: true
 })

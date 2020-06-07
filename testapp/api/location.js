@@ -11,7 +11,7 @@ export const getLocationData = async () => {
 
 export const setLocation = async (body) => {
     const url = `${endpoint}/location/setLocationData`;
-    const headers = await setHeader('POST', body)
+    const headers = await setHeader('POST', { body: JSON.stringify(body) })
     const response = await fetch(url,headers)
     return response.json()
 }

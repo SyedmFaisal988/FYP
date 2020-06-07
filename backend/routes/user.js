@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const authenticate = require('../authenticate')
 const User = require('../models/User')
+const locationModal = require('../models/Location')
 
 const userRouter = express.Router();
 userRouter.use(express.json())
@@ -17,10 +18,11 @@ userRouter.route('/signup').post(async (req, res)=>{
             res.setHeader('Content-Type', 'application/json')
             return res.json({ message: `${email} is already in use`, success: false })
         }else{
-            await User.register(new User({
+            const newUser = await User.register(new User({
                 username,
                 email,
             }), password)
+            await locationModal.create({ userId: newUser._id.toString(), cords: [] })
             res.statusCode = 200
             res.setHeader('Content-Type', 'application/json')
             res.json({ message: 'signup successful', success: true })

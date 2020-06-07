@@ -5,8 +5,10 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
 import Constants from "expo-constants";
+import Loader from '../components/loader'
 import { uploadImage, setLocation } from "../api";
 import { endpoint } from "../constants";
+import { Context } from '../context'
 
 class Camera extends Component {
     state = {
@@ -51,7 +53,7 @@ class Camera extends Component {
       if (!result.cancelled) {
         const filename = `${new Date().valueOf()}`;
         await this.uploadImageAsync(result.base64, filename);
-        const { mapRegion, imageMarker } = this.state;
+        const { mapRegion } = this.props.context;
         await setLocation({
           point: {
             latitude: mapRegion.latitude,
@@ -65,15 +67,19 @@ class Camera extends Component {
         fileReaderInstance.readAsDataURL(blob._bodyBlob);
         fileReaderInstance.onload = () => {
           const base64data = fileReaderInstance.result;
-          imageMarker.push({
+          let newImageMarker = {
             coords: mapRegion,
             uri: base64data,
-          });
-          this.setState({ imageMarker });
+          };
+          this.setState({ loading: false })
+          this.props.navigation.navigate("Marker", {
+            imageMarker: newImageMarker
+          })
         };
+      }else{
+        this.props.navigation.navigate("Marker")
+        return this.setState({ loading: false })
       }
-      this.props.navigation.navigate("Marker")
-      return this.setState({ loading: false })
     };
   
     uploadImageAsync(blob, name) {
@@ -86,10 +92,18 @@ class Camera extends Component {
     };
   
     render() {
+      const { loading } = this.state
       return (
+        <>
+        <Loader loading={loading} />
         <View/>
+        </>
       );
     }
   }
   
-  export default Camera;
+  export default (props) => <Context.Consumer>
+    {
+      context=> <Camera {...props} context={context} />
+    }
+  </Context.Consumer>;

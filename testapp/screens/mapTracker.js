@@ -15,18 +15,19 @@ import Header from "../components/Header";
 import { getLocationData } from "../api";
 import { endpoint } from "../constants";
 import { Check } from "../components/icons";
+import { Context } from '../context'
 
 class Maptracker extends Component {
   state = {
-    mapRegion: null,
     customMarker: [],
     timestamp: new Date().valueOf(),
     test: false,
     cameraStatus: null,
     imageMarker: [],
-    loading: false,
+    loading: true,
     filterModalOpen: false,
     filter: "all",
+    displayData: []
   };
   coordinate = [];
   PositionWatcher = null;
@@ -35,8 +36,7 @@ class Maptracker extends Component {
   mapData = (data) =>
     data.message.cords.map((ele) => ({
       coords: {
-        latitude: ele.latitude,
-        longitude: ele.longitude,
+        ...ele,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       },
@@ -49,18 +49,19 @@ class Maptracker extends Component {
     };
     this.state.test && this.calculateCordinated(data);
     this.setState({ mapRegion });
+    const { context: { setMapRegion } } = this.props
+    setMapRegion(mapRegion)
   };
 
   fetchImages = async (image, index) => {
     const blob = await fetch(image.uri);
-
     const fileReaderInstance = new FileReader();
     fileReaderInstance.readAsDataURL(blob._bodyBlob);
     fileReaderInstance.onload = () => {
       const base64data = fileReaderInstance.result;
       let imageMarker = JSON.parse(JSON.stringify(this.state.imageMarker));
       imageMarker[index].uri = base64data;
-      this.setState({ imageMarker });
+      this.setState({ imageMarker, displayData: imageMarker });
     };
   };
 
@@ -68,15 +69,13 @@ class Maptracker extends Component {
     this.navigationListener = this.props.navigation.addListener(
       "focus",
       async () => {
-        console.log("chala");
         const data = await getLocationData();
         const formatedData = this.mapData(data);
-        this.setState({ imageMarker: formatedData });
+        this.setState({ imageMarker: formatedData, displayData: formatedData });
         for (var i = 0; i < formatedData.length; i++) {
           await this.fetchImages(formatedData[i], i);
         }
         await this.getCurrentPosition();
-        console.log("false");
         return this.setState({ loading: false });
       }
     );
@@ -112,6 +111,13 @@ class Maptracker extends Component {
             longitudeDelta: 0.0421,
           },
         });
+        const { context: { setMapRegion } } = this.props
+        setMapRegion({
+          latitude: res.coords.latitude,
+          longitude: res.coords.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        })
       });
     }
   };
@@ -169,9 +175,8 @@ class Maptracker extends Component {
         }
       );
     }
-
-    // Center the map on the location we just fetched.
   };
+
   clearMap = () => {
     const { mapRegion } = this.state;
     this.coordinate = [mapRegion];
@@ -186,15 +191,42 @@ class Maptracker extends Component {
     this.setState({ filterModalOpen: open });
   };
 
+  onChangeFilter = (value) => {
+    const filter = value.toLowerCase()
+    const { imageMarker } = this.state
+    let displayData = []
+    switch(filter){
+      case 'all':
+          displayData = imageMarker
+        break;
+        case 'pending':
+          displayData = imageMarker.filter(ele => !ele.coords.processing)
+          break;
+        case 'processing':
+          displayData = imageMarker.filter(ele => {
+            return !ele.coords.complete && ele.coords.processing
+          })
+          break;
+        case 'solved':
+          displayData = imageMarker.filter(ele => Boolean(ele.coords.complete))
+          break;
+    }
+    this.setState({
+      filter,
+      filterModalOpen: false,
+      displayData
+    })
+  }
+
   render() {
     const {
-      mapRegion,
       customMarker,
-      imageMarker,
+      displayData,
       loading,
       filterModalOpen,
       filter,
     } = this.state;
+    const { context: { mapRegion } } = this.props
     let data = ["All", "Pending", "Processing", "Solved"];
     return (
       <SafeAreaView style={{ flex: 1 }}>
@@ -212,8 +244,8 @@ class Maptracker extends Component {
             onRegionChange={(data) => this.onRegionChange(data)}
             style={{ flex: 1, zIndex: -1 }}
           >
-            {imageMarker.length ? (
-              imageMarker.map((ele, index) => (
+            {displayData.length ? (
+              displayData.map((ele, index) => (
                 <Marker
                   key={index.toString()}
                   index={index.toString()}
@@ -261,11 +293,7 @@ class Maptracker extends Component {
               ]}
             >
               <TouchableOpacity
-                onPress={() =>
-                  this.setState({
-                    filter: ele.toLowerCase(),
-                    filterModalOpen: false
-                  })
+                onPress={() => this.onChangeFilter(ele)
                 }
                 style={styles.optionWrapper}
               >
@@ -322,4 +350,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Maptracker;
+export default (props) => <Context.Consumer>
+  {
+    context =>  <Maptracker {...props} context={context} />
+  }
+</Context.Consumer>;

@@ -6,7 +6,7 @@ export default ({ parentProps: { navigation: { dispatch, navigate } } }) => {
 
     useEffect(()=> {
         console.log(dispatch)
-        AsyncStorage.clear().then(()=>{
+        AsyncStorage.removeItem('token').then(()=>{
             navigate('unAuthorizeNavigator')
         })
     }, [])

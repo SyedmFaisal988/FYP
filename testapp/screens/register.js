@@ -24,7 +24,7 @@ class Register extends Component {
         const { fullName, email, password } = this.state
         const response = await signup({ username: fullName, email, password })
         if(response.success){
-            this.props.navigation.navigate('login')
+            this.props.navigation.navigate('Start')
             return this.setState({ loading: false })
         }else{
             alert(response.messag || "Something went wrong")

@@ -12,6 +12,6 @@ export default (parentProps) => <NavigationContainer>
     <Drawer.Navigator  initialRouteName="Marker">
         <Drawer.Screen name="Marker" component={mapTracker}/>
         <Drawer.Screen name="Camera" component={Camera} />
-        <Drawer.Screen name="logout" component={(props)=> <Logout parentProps={parentProps} {...props} /> } />
+        <Drawer.Screen name="Logout" component={(props)=> <Logout parentProps={parentProps} {...props} /> } />
     </Drawer.Navigator>
 </NavigationContainer>
