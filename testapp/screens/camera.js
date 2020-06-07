@@ -72,7 +72,7 @@ class Camera extends Component {
           this.setState({ imageMarker });
         };
       }
-      this.props.navigation.navigate("mapTracker")
+      this.props.navigation.navigate("Marker")
       return this.setState({ loading: false })
     };
   

@@ -5,15 +5,11 @@ import { check } from '../api'
 import { StackActions, NavigationActions } from 'react-navigation'
 
 export default Start = (props) => {
-    console.log("aya")
     AsyncStorage.getItem("token")
         .then(async (token) => {
-            console.log('token', token)
             if (token) {
                 const response = await check()
-                console.log('res',response)
                 if (response.success) {
-                    console.log('yaham')
                     const resetAction = StackActions.reset({
                         index: 0,
                         actions: [NavigationActions.navigate({ routeName: "authorizeNavigator" })],
@@ -29,7 +25,6 @@ export default Start = (props) => {
             return props.navigation.dispatch(resetAction)
         })
         .catch(err => {
-            console.log(err, 'err')
             const resetAction = StackActions.reset({
                 index: 0,
                 actions: [NavigationActions.navigate({ routeName: "unAuthorizeNavigator" })],

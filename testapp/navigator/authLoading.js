@@ -11,7 +11,7 @@ const AuthLoading = createStackNavigator({
 }, {
     initialRouteName: "Start",
     defaultNavigationOptions: {
-        header: null,
+        headerShown: false,
     }
 })
 
