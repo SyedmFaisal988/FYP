@@ -3,15 +3,23 @@ import { setHeader } from '../utils/setHeader'
 
 const logIn = async (inputData) => {
     const url = `${endpoint}/users/login`
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(inputData)
-    })
-    return response.json()
+    try{
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(inputData)
+        })        
+        const res = await response.json()
+        return res
+    }
+    catch(err){
+        return {
+            success: false
+        }
+    }
 }
 
 const check = async ()=>{

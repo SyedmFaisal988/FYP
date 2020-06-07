@@ -54,7 +54,7 @@ class Login extends Component {
         const { username, password, loading } = this.state;
         return (
             <ScrollView ref={ref => this.scrollRef = ref} >
-            <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }} enabled={true} >
+            <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }} enabled >
                 <StatusBar backgroundColor="black" barStyle="light-content" />
                 <LoadingScreen loading={loading}/>
                 <SafeAreaView style={{ height: height  }}>

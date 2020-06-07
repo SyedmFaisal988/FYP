@@ -39,8 +39,9 @@ userRouter.route('/login')
     passport.authenticate('local')(req, res, ()=>{
         const token = authenticate.getToken({ _id: req.user._id })
         res.statusCode = 200
-        res.json({ token: token, success: true })
+        return res.json({ token: token, success: true })
     })
+  
 })
 
 userRouter.route('/check').get(authenticate.verifyUser, (req, res)=>{
