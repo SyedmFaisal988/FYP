@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
@@ -7,6 +7,8 @@ import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
+import { adminLogin } from '../api'
+import { useHistory } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -45,10 +47,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default (props) => {
+export const Login = () => {
   const classes = useStyles();
+  const history = useHistory()
   const [values, setValues] = React.useState({
-    email: "",
+    username: "",
     password: "",
     showPassword: false,
   });
@@ -59,6 +62,17 @@ export default (props) => {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+
+  const handleLogin = async () => {
+    const response = await adminLogin({
+      username: values.username,
+      password: values.password
+    })
+    console.log({ values, response })
+    if(response.success){
+      history.push('/')
+    }
+  }
   return (
     <div className={classes.root}>
       <div className={classes.wrapper}>
@@ -66,7 +80,7 @@ export default (props) => {
           <div className={classes.row}>
             <div style={{ width: "150px" }}>
               <Typography className={classes.cell} variant="h6">
-                Email
+                User Name
               </Typography>
             </div>
             <div className={classes.cell}>
@@ -77,10 +91,10 @@ export default (props) => {
                 onChange={(event) =>
                   setValues({
                     ...values,
-                    email: event.target.value,
+                    username: event.target.value,
                   })
                 }
-                value={values.email}
+                value={values.username}
                 variant="outlined"
               />
             </div>
@@ -121,7 +135,7 @@ export default (props) => {
             </div>
           </div>
           <div className={classes.loginButton}>
-            <Button variant="contained" color="primary">
+            <Button onClick={handleLogin} variant="contained" color="primary">
               Login
             </Button>
           </div>

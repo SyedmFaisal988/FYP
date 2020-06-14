@@ -46,6 +46,22 @@ userRouter.route('/login')
   
 })
 
+userRouter.route('/login-admin').post((req, res)=>{
+    passport.authenticate('local')(req, res, ()=>{
+        const { user: { isadmin, _id } } = req
+        if(isadmin){
+            const token = authenticate.getToken({ _id })
+            res.statusCode = 200
+            res.setHeader('Content-Type', 'application/json')
+            return res.json({ token: token, success: true })
+        }else{
+            res.statusCode = 401
+            res.setHeader('Content-Type', 'application/json')
+            return res.json({ token: null, success: false })
+        }
+    })
+})
+
 userRouter.route('/check').get(authenticate.verifyUser, (req, res)=>{
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json')

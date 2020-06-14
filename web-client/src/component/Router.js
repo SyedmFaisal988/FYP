@@ -1,10 +1,11 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import Login from '../screens/Login'
+import { Login, DashBoard } from '../screens'
 
-export default (props) => <Router>
+export default () => <Router>
     <Switch>
         <Route exact path="/login" component={Login} />
+        <Route exact path='/' component={DashBoard} />
     </Switch>
 </Router>
