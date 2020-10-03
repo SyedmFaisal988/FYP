@@ -5,7 +5,7 @@ import {
   Redirect,
   BrowserRouter as Router,
 } from "react-router-dom";
-import { Login, DashBoard } from "../screens";
+import { Login, DashBoard, Maps } from "../screens";
 
 const PrivateRoute = ({ component, ...rest }) => {
   const isAuthed = localStorage.getItem("AUTH_TOKEN");
@@ -33,6 +33,7 @@ export default () => (
   <Router>
     <Switch>
       <Route exact path="/login" component={Login} />
+      <PrivateRoute path='/Maps' component={Maps} />
       <PrivateRoute path="/" component={DashBoard} />
     </Switch>
   </Router>

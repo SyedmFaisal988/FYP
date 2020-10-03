@@ -1,6 +1,7 @@
 import React, { useEffect, useState} from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import { Table, AppBarComponent } from '../component'
+import { getLocationData } from '../api'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -10,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
 
 export const DashBoard = () => {
     const classes = useStyles()
-    console.log('render')
+    const [data, setData] = useState([]);
     return (
         <div className={classes.root} >
           <AppBarComponent title="Dashboard" />

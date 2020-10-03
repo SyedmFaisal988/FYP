@@ -9,6 +9,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import MapIcon from '@material-ui/icons/Map';
 
 const useStyles = makeStyles({
   list: {
@@ -51,11 +52,17 @@ export default function TemporaryDrawer({ state, setState }) {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        <ListItem button key={"Dashboard"}>
+        <ListItem button onClick={() => history.push('/') } key={"Dashboard"}>
           <ListItemIcon>
             <DashboardIcon />
           </ListItemIcon>
           <ListItemText primary={"Dashboard"} />
+        </ListItem>
+        <ListItem button onClick={() => history.push('/Maps') } key={"Maps"}>
+          <ListItemIcon >
+            <MapIcon />
+          </ListItemIcon>
+          <ListItemText primary={"Map"} />
         </ListItem>
         <ListItem button onClick={logout} key={"Logout"}>
           <ListItemIcon >

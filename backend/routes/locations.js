@@ -53,7 +53,6 @@ locationRouter.route("/uploads")
   
   locationRouter.route("/setLocationData").post(authenticate.verifyUser, (req, res) => {
     const { body: { point } } = req
-    console.log({ point })
     locationModal.findOneAndUpdate({ userId: req.user._id }, { $push: { 'cords': { ...point, created: new Date() } } })
       .then((resp) => {
         console.log({ success: "success" });
@@ -69,6 +68,28 @@ locationRouter.route("/uploads")
           message: "Something went wrong",
         });
       });
+  });
+
+
+  locationRouter.route("/updateStatus").post(authenticate.verifyUser, async (req, res) => {
+    const { body: { point: { id, point }, status } } = req
+    console.log({ status, point, id, })
+    const locationData = await locationModal.findById(id).lean();
+    const updatePointIndex = locationData.cords.findIndex(ele => ele.id === point.id)
+    if ( updatePointIndex >= 0 ) {
+      if (status === 'processing')
+        point.processing = new Date();
+      else 
+        point.complete = new Date();
+      const updatedCords = locationData.cords;
+      updatedCords[updatePointIndex] = point;
+      const resp = await locationModal.findByIdAndUpdate(id, { $set: { cords: updatedCords } })
+      console.log({ resp });
+      return res.json({
+        status: 200,
+        message: 'operation successfull'
+      })
+    }
   });
 
 

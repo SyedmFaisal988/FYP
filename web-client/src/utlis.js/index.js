@@ -1,1 +1,2 @@
-export * from './setHeaders'
+export * from './setHeaders';
+export * from './setImage';

@@ -1,5 +1,5 @@
 export const setHeader = (method, body)=>{
-    const token = localStorage.getItem('token').replace(/"/g, '')
+    const token = localStorage.getItem('AUTH_TOKEN').replace(/"/g, '')
     return{
         method,
         headers:{
