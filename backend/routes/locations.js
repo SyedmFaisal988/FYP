@@ -31,8 +31,9 @@ locationRouter.route("/uploads")
   });
   
   locationRouter.route("/getLocationData",).get(authenticate.verifyUser, (req, res) => {
+    const { user: { isadmin: isAdmin } } = req
     try {
-      locationModal.findOne({ userId: req.user._id }).then((resp) => {
+      locationModal.findOne(isAdmin ? {} : { userId: req.user._id }).then((resp) => {
         res.statusCode = 200;
         return res.json({
           status: true,

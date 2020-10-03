@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const DisplayCard = ({
-  data: { url, processing, complete, created, point }
+  data: { url, processing, complete, created, point }, refresh
 }) => {
   const classes = useStyles();
   const [expanded, setExpanded] = useState(false);
@@ -93,6 +93,8 @@ export const DisplayCard = ({
                   updateStatus({
                     point,
                     status: 'processing'
+                  }).then(() => {
+                    refresh();
                   })
                 }}
               >
@@ -123,6 +125,8 @@ export const DisplayCard = ({
                   updateStatus({
                     point,
                     status: 'complete'
+                  }).then(() => {
+                    refresh();
                   })
                 }}
               >

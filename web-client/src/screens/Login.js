@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
@@ -9,6 +9,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 import { adminLogin } from '../api'
 import { useHistory } from 'react-router-dom'
+import { SnackbarComponent } from '../component'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,11 +52,39 @@ const useStyles = makeStyles((theme) => ({
 export const Login = () => {
   const classes = useStyles();
   const history = useHistory()
+  const [alert, setAlert] = useState({
+    open: false,
+    severity: 'error',
+    message: ''
+  })
   const [values, setValues] = React.useState({
     username: "",
     password: "",
     showPassword: false,
   });
+
+  const handleOpen = ({
+    message,
+    severity,
+  }) => {
+    setAlert({
+      open: true,
+      message,
+    severity,
+    });
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAlert((prevAlert) => ({
+      ...prevAlert,
+      open: false
+    }));
+  };
+
   const handleClickShowPassword = () => {
     setValues({ ...values, showPassword: !values.showPassword });
   };
@@ -69,10 +98,14 @@ export const Login = () => {
       username: values.username,
       password: values.password
     })
-    console.log({ response })
     if(response.success){
       localStorage.setItem('AUTH_TOKEN', response.token)
       history.push('/')
+    } else {
+      handleOpen({
+        message: 'Invalid Credentials',
+        severity: 'error'
+      })
     }
   }
   return (
@@ -143,6 +176,7 @@ export const Login = () => {
           </div>
         </form>
       </div>
+      <SnackbarComponent {...alert} handleClose={handleClose} />
     </div>
   );
 };

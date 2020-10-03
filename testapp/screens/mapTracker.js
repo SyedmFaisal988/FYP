@@ -54,6 +54,7 @@ class Maptracker extends Component {
   };
 
   fetchImages = async (image, index) => {
+    console.log({ image })
     const blob = await fetch(image.uri);
     const fileReaderInstance = new FileReader();
     fileReaderInstance.readAsDataURL(blob._bodyBlob);
@@ -70,12 +71,15 @@ class Maptracker extends Component {
       "focus",
       async () => {
         const data = await getLocationData();
+        console.log({data})
         const formatedData = this.mapData(data);
         this.setState({ imageMarker: formatedData, displayData: formatedData });
         for (var i = 0; i < formatedData.length; i++) {
           await this.fetchImages(formatedData[i], i);
         }
+        console.log('fet')
         await this.getCurrentPosition();
+        console.log(false)
         return this.setState({ loading: false });
       }
     );
@@ -228,6 +232,7 @@ class Maptracker extends Component {
     } = this.state;
     const { context: { mapRegion } } = this.props
     let data = ["All", "Pending", "Processing", "Solved"];
+    console.log("aya")
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <Header
@@ -265,7 +270,7 @@ class Maptracker extends Component {
             ) : (
               <></>
             )}
-            {this.coordinate.length >= 2 ? (
+            {/* {this.coordinate.length >= 2 ? (
               <Marker
                 coordinate={this.coordinate[this.coordinate.length - 1]}
               />
@@ -278,7 +283,7 @@ class Maptracker extends Component {
             <Polyline
               coordinates={JSON.parse(JSON.stringify(this.coordinate))}
               strokeWidth={3}
-            />
+            /> */}
           </MapView>
         ) : (
           <></>

@@ -1,1 +1,1 @@
-export const endpoint = false ? 'http://10.0.2.2:4000' : 'https://192.168.4.105.4000'
+export const endpoint = false ? 'http://10.0.2.2:4000' : 'https://eef238282ea4.ngrok.io'

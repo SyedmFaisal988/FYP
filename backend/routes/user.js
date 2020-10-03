@@ -38,6 +38,7 @@ userRouter.route('/signup').post(async (req, res)=>{
 
 userRouter.route('/login')
 .post((req, res)=>{
+    console.log('aya')
     passport.authenticate('local')(req, res, ()=>{
         const token = authenticate.getToken({ _id: req.user._id })
         res.statusCode = 200

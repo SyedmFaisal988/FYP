@@ -24,6 +24,7 @@ const logIn = async (inputData) => {
 
 const check = async ()=>{
     const url = `${endpoint}/users/check`
+    console.log({ url })
     const headers = await setHeader('GET')
     const response = await fetch(url, headers)
     return response.json()

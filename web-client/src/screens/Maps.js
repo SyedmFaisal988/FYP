@@ -17,6 +17,33 @@ class Maps extends Component {
     data: [],
   };
 
+  initializeData = () => {
+    getLocationData().then((res) => {
+      if (res.status) {
+        const {
+          message: { cords },
+        } = res;
+        const newData = cords.map((ele) => ({
+          lat: ele.latitude,
+          lng: ele.longitude,
+          data: {
+            url: getImage(ele.image),
+            created: ele.created,
+            processing: ele.processing,
+            complete: ele.complete,
+            point: {
+              id: res.message._id,
+              point: ele,
+            },
+          }
+        }));
+        this.setState({
+          data: newData,
+        });
+      }
+    });
+  }
+
 
   componentDidMount() {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -29,31 +56,7 @@ class Maps extends Component {
           lng: longitude || 24,
         },
       });
-      getLocationData().then((res) => {
-        if (res.status) {
-          const {
-            message: { cords },
-          } = res;
-          console.log({ res })
-          const newData = cords.map((ele) => ({
-            lat: ele.latitude,
-            lng: ele.longitude,
-            data: {
-              url: getImage(ele.image),
-              created: ele.created,
-              processing: ele.processing,
-              complete: ele.complete,
-              point: {
-                id: res.message._id,
-                point: ele,
-              },
-            }
-          }));
-          this.setState({
-            data: newData,
-          });
-        }
-      });
+      this.initializeData()
     });
   }
 
@@ -77,7 +80,7 @@ class Maps extends Component {
           }}
         >
           {data.map((ele) => (
-            <DisplayCard lat={ele.lat} lng={ele.lng} data={ele.data} zoom={zoom} />
+            <DisplayCard lat={ele.lat} lng={ele.lng} data={ele.data} refresh={this.initializeData} />
           ))}
         </GoogleMapReact>
       </div>
