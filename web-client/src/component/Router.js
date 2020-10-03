@@ -1,11 +1,39 @@
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import React from "react";
+import {
+  Route,
+  Switch,
+  Redirect,
+  BrowserRouter as Router,
+} from "react-router-dom";
+import { Login, DashBoard } from "../screens";
 
-import { Login, DashBoard } from '../screens'
+const PrivateRoute = ({ component, ...rest }) => {
+  const isAuthed = localStorage.getItem("AUTH_TOKEN");
+  return (
+    <Route
+      {...rest}
+      exact
+      render={(props) =>
+        isAuthed ? (
+          React.createElement(component, props)
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: props.location },
+            }}
+          />
+        )
+      }
+    />
+  );
+};
 
-export default () => <Router>
+export default () => (
+  <Router>
     <Switch>
-        <Route exact path="/login" component={Login} />
-        <Route exact path='/' component={DashBoard} />
+      <Route exact path="/login" component={Login} />
+      <PrivateRoute path="/" component={DashBoard} />
     </Switch>
-</Router>
+  </Router>
+);

@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
     border: "1px solid",
     justifyContent: "center",
     alignItems: "center",
+    height: '100vh'
   },
   wrapper: {
     border: "1px solid",
@@ -68,8 +69,9 @@ export const Login = () => {
       username: values.username,
       password: values.password
     })
-    console.log({ values, response })
+    console.log({ response })
     if(response.success){
+      localStorage.setItem('AUTH_TOKEN', response.token)
       history.push('/')
     }
   }
