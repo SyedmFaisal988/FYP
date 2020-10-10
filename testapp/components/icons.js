@@ -306,6 +306,12 @@ const AudioIcon = props => (
   </Svg>
 )
 
+const CloseIcon = props => (
+  <Svg height={40} viewBox="0 0 40 40" width={40} {...props}>
+    <Path scale={0.04} d="M512.001 84.853L427.148 0 256.001 171.147 84.853 0 0 84.853 171.148 256 0 427.148l84.853 84.853 171.148-171.147 171.147 171.147 84.853-84.853L340.853 256z" />
+  </Svg>
+)
+
 export {
   Envalop,
   Password,
@@ -324,5 +330,6 @@ export {
   AddFile,
   ImageIcon,
   VideoIcon,
-  AudioIcon
+  AudioIcon,
+  CloseIcon
 };

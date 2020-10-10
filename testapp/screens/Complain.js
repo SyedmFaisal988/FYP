@@ -9,12 +9,26 @@ import {
   ScrollView,
   Vibration,
   ToastAndroid,
+  Modal,
+  Dimensions
 } from "react-native";
-import { Upload, AddFile, ImageIcon, VideoIcon, AudioIcon } from "../components/icons";
-import InputField from "../components/InputFields";
-import * as ImagePicker from "expo-image-picker";
+import { Video } from 'expo-av';
 import { Audio } from "expo-av";
+import * as ImagePicker from "expo-image-picker";
+import {MaterialIcons} from '@expo/vector-icons';
+import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import {
+  Upload,
+  AddFile,
+  ImageIcon,
+  VideoIcon,
+  AudioIcon,
+  CloseIcon,
+} from "../components/icons";
+import InputField from "../components/InputFields";
 import Header from "../components/Header";
+
+const { width } = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   root: {
@@ -38,7 +52,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   addFileButton: {
-    marginLeft: 0
+    marginLeft: 0,
   },
   attachmentButtons: {
     backgroundColor: "#eaeaea",
@@ -49,8 +63,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     elevation: 10,
     marginHorizontal: 15,
-    marginBottom: 10
-  }
+    marginBottom: 10,
+  },
 });
 
 let recording = null;
@@ -61,17 +75,41 @@ class Complain extends React.Component {
     subject: "",
     description: "",
     cover: "",
-    attachments: [
+    preview: {},
+    attachments: [],
+    options: [
       {
-        type: "image",
-      },
-      {
-        length: 234,
-      },
-      {
-        uri: "",
+        name: 'Fruits',
+        id: 0,
+        children: [
+          {
+            name: 'Apple',
+            id: 10,
+          },
+          {
+            name: 'Strawberry',
+            id: 17,
+          },
+          {
+            name: 'Pineapple',
+            id: 13,
+          },
+          {
+            name: 'Banana',
+            id: 14,
+          },
+          {
+            name: 'Watermelon',
+            id: 15,
+          },
+          {
+            name: 'Kiwi fruit',
+            id: 16,
+          },
+        ],
       },
     ],
+    selectedItems: []
   };
 
   initializeComponent = async () => {
@@ -104,6 +142,7 @@ class Complain extends React.Component {
       aspect: [4, 3],
       quality: 0.4,
       allowsMultipleSelection: true,
+      base64: true,
       exif: true,
     });
     console.log({ result });
@@ -192,11 +231,76 @@ class Complain extends React.Component {
     );
   };
 
+  onSelect = (selectedItems) => {
+    console.log({ selectedItems });
+    this.setState({ selectedItems })
+  }
+
   render() {
-    const { imageUrl, subject, description, attachments } = this.state;
+    const { imageUrl, subject, description, attachments, preview, options, selectedItems } = this.state;
     return (
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }} enabled>
         <Header text="Complain" {...this.props} />
+        <Modal
+          animationType="slide"
+          visible={Boolean(Object.keys(preview).length)}
+          onRequestClose={() => {
+            this.setState({
+              preview: {},
+            });
+          }}
+        >
+          <View style={{ backgroundColor: "#000", flex: 1 }}>
+            <TouchableOpacity
+              onPress={() =>
+                this.setState({
+                  preview: {},
+                })
+              }
+              style={{
+                alignSelf: "flex-end",
+                marginTop: 15,
+              }}
+            >
+              <CloseIcon fill="#fff" />
+            </TouchableOpacity>
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              {preview.length ? (
+                <View />
+              ) : (
+                <View
+                  style={{
+                    width: width,
+                    backgroundColor: "#fff",
+                    height: width * (9 / 16),
+                  }}
+                >
+                  {preview.type === "image" ? (
+                    <Image
+                      style={{ height: "100%", width: "100%" }}
+                      source={{ uri: preview.uri }}
+                    />
+                  ) : (
+                    <Video
+                      source={{ uri: preview.uri }}
+                      rate={1.0}
+                      volume={1.0}
+                      shouldPlay
+                      isMuted={false}
+                      isLooping
+                      useNativeControls
+                      resizeMode="contain"
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                      }}
+                    />
+                  )}
+                </View>
+              )}
+            </View>
+          </View>
+        </Modal>
         <ScrollView>
           <View style={styles.root}>
             <TouchableOpacity
@@ -231,6 +335,31 @@ class Complain extends React.Component {
               value={description}
               onChange={(value) => this.handleChangeInput("description", value)}
             />
+            <SectionedMultiSelect
+              styles={{
+                selectToggle: {
+                  height: 40,
+                  paddingTop: 7,
+                  marginTop: 10,
+                  paddingLeft: 10,
+                  borderRadius: 10,
+                  backgroundColor: '#e1e1e1'
+                }
+              }}
+              items={options}
+              IconRenderer={MaterialIcons}
+              uniqueKey="id"
+              subKey="children"
+              selectText="Select"
+              hideSearch={true}
+              showDropDowns={true}
+              readOnlyHeadings={true}
+              onSelectedItemsChange={this.onSelect}
+              selectedItems={selectedItems}
+              colors={{
+                primary: '#f28800'
+              }}
+            />
             <View style={{ marginBottom: 15 }} />
             <Text style={styles.labelText}>Attachments</Text>
             <View style={styles.attachmentContainer}>
@@ -250,7 +379,9 @@ class Complain extends React.Component {
               >
                 {attachments.map((attachment, index) => (
                   <TouchableOpacity
+                    key={attachment.uri}
                     onLongPress={() => this.handleRemoveAttachment(index)}
+                    onPress={() => this.setState({ preview: attachment })}
                     style={styles.attachmentButtons}
                   >
                     {attachment.length ? (

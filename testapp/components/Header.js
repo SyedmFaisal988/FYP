@@ -1,6 +1,5 @@
 import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { Dropdown } from 'react-native-material-dropdown'; 
 import Constants from "expo-constants";
 import { Menu, Filter } from './icons'
 
