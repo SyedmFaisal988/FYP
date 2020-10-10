@@ -27,6 +27,9 @@ import {
 } from "../components/icons";
 import InputField from "../components/InputFields";
 import Header from "../components/Header";
+import SubmitButton from '../components/BigButton';
+import { setComplaint } from "../api";
+import { Context } from '../context'
 
 const { width } = Dimensions.get('window')
 
@@ -65,6 +68,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     marginBottom: 10,
   },
+  selectToggle: {
+    height: 40,
+    paddingTop: 7,
+    marginTop: 10,
+    paddingLeft: 10,
+    borderRadius: 10,
+    backgroundColor: '#e1e1e1'
+  }
 });
 
 let recording = null;
@@ -79,37 +90,37 @@ class Complain extends React.Component {
     attachments: [],
     options: [
       {
-        name: 'Fruits',
-        id: 0,
+        name: "Fruits",
+        id: "0",
         children: [
           {
-            name: 'Apple',
-            id: 10,
+            name: "Apple",
+            id: "00",
           },
           {
-            name: 'Strawberry',
-            id: 17,
+            name: "Strawberry",
+            id: "01",
           },
           {
-            name: 'Pineapple',
-            id: 13,
+            name: "Pineapple",
+            id: "02",
           },
           {
-            name: 'Banana',
-            id: 14,
+            name: "Banana",
+            id: "03",
           },
           {
-            name: 'Watermelon',
-            id: 15,
+            name: "Watermelon",
+            id: "04",
           },
           {
-            name: 'Kiwi fruit',
-            id: 16,
+            name: "Kiwi fruit",
+            id: "05",
           },
         ],
       },
     ],
-    selectedItems: []
+    selectedItems: [],
   };
 
   initializeComponent = async () => {
@@ -131,6 +142,7 @@ class Complain extends React.Component {
 
   componentDidMount() {
     this.initializeComponent();
+    console.log(this.props.context.mapRegion)
   }
 
   handlePickImage = async (isCover = false) => {
@@ -145,7 +157,6 @@ class Complain extends React.Component {
       base64: true,
       exif: true,
     });
-    console.log({ result });
     if (result && !result.cancelled) {
       if (isCover) {
         this.setState({
@@ -153,6 +164,19 @@ class Complain extends React.Component {
           cover: result.base64,
         });
       } else {
+        await new Promise((resolve, reject) => {
+          fetch(result.uri).then((blob) => {
+            const fileReaderInstance = new FileReader();
+            fileReaderInstance.readAsDataURL(blob._bodyBlob);
+            fileReaderInstance.onload = () => {
+              result.base64 = fileReaderInstance.result;
+              resolve();
+            };
+          }).catch((err) => {
+            console.log("err", err)
+            reject();
+          });
+        });
         this.setState((prevState) => ({
           attachments: prevState.attachments.concat([
             { type: result.type, uri: result.uri, blob: result.base64 },
@@ -178,11 +202,11 @@ class Complain extends React.Component {
   playBackRecording = async (recordingInstance) => {
     const soundObject = new Audio.Sound();
     try {
-      await soundObject.loadAsync({ uri: recordingInstance._uri });
+      await soundObject.loadAsync({ uri: recordingInstance.uri });
       await soundObject.playAsync();
       setTimeout(() => {
         soundObject.unloadAsync().then(() => {});
-      }, recordingInstance._finalDurationMillis);
+      }, recordingInstance.length);
     } catch (error) {
       // An error occurred!
     }
@@ -206,9 +230,8 @@ class Complain extends React.Component {
           },
         ]),
       }));
+      recording = null;
     };
-    await this.playBackRecording(recording);
-    recording = null;
   };
 
   handleRemoveAttachment = (index) => {
@@ -232,12 +255,45 @@ class Complain extends React.Component {
   };
 
   onSelect = (selectedItems) => {
-    console.log({ selectedItems });
-    this.setState({ selectedItems })
-  }
+    this.setState({ selectedItems });
+  };
+
+  handleSubmit = async () => {
+    const {
+      subject,
+      description,
+      attachments,
+      selectedItems: selectedItemsRaw,
+      cover,
+      options,
+    } = this.state;
+    const { context: { mapRegion: { latitude, longitude } } } = this.props;
+    const selectedItems = selectedItemsRaw.map((ele) => {
+      const parent = ele.slice(0, 1);
+      return options[+parent].children[+ele.slice(1)].name;
+    });
+    const status = await setComplaint({
+      subject,
+      description,
+      attachments,
+      selectedItems,
+      cover,
+      latitude,
+      longitude,
+    });
+    console.log({ status });
+  };
 
   render() {
-    const { imageUrl, subject, description, attachments, preview, options, selectedItems } = this.state;
+    const {
+      imageUrl,
+      subject,
+      description,
+      attachments,
+      preview,
+      options,
+      selectedItems,
+    } = this.state;
     return (
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }} enabled>
         <Header text="Complain" {...this.props} />
@@ -337,14 +393,7 @@ class Complain extends React.Component {
             />
             <SectionedMultiSelect
               styles={{
-                selectToggle: {
-                  height: 40,
-                  paddingTop: 7,
-                  marginTop: 10,
-                  paddingLeft: 10,
-                  borderRadius: 10,
-                  backgroundColor: '#e1e1e1'
-                }
+                selectToggle: styles.selectToggle,
               }}
               items={options}
               IconRenderer={MaterialIcons}
@@ -357,7 +406,7 @@ class Complain extends React.Component {
               onSelectedItemsChange={this.onSelect}
               selectedItems={selectedItems}
               colors={{
-                primary: '#f28800'
+                primary: "#f28800",
               }}
             />
             <View style={{ marginBottom: 15 }} />
@@ -406,10 +455,16 @@ class Complain extends React.Component {
             </View>
           </View>
           <View style={{ marginBottom: 15 }} />
+          <SubmitButton text="Submit" onPress={this.handleSubmit} />
+          <View style={{ marginBottom: 15 }} />
         </ScrollView>
       </KeyboardAvoidingView>
     );
   }
 }
 
-export default Complain;
+export default (props) => <Context.Consumer>
+{
+  context=> <Complain {...props} context={context} />
+}
+</Context.Consumer>;

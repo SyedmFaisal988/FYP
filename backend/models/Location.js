@@ -14,6 +14,22 @@ const CordsSchema = new Schema({
         type: String,
         required: false
     },
+    attachments: [{
+        type: String,
+        required: false,
+    }],
+    subject: {
+        type: String,
+        required: true,
+    },
+    description: {
+        type: String,
+        required: true,
+    },
+    attachments: [{
+        type: String,
+        required: false,
+    }],
     processing: {
         type: Date,
         required: false
