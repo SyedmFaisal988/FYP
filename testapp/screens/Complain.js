@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Vibration,
+  ToastAndroid,
 } from "react-native";
 import { Upload, AddFile, ImageIcon, VideoIcon, AudioIcon } from "../components/icons";
 import InputField from "../components/InputFields";
@@ -59,13 +60,18 @@ class Complain extends React.Component {
     imageUrl: "",
     subject: "",
     description: "",
-    attachments: [{
-      type: ImagePicker.MediaTypeOptions.Images
-    }, {
-      length: 234,
-    }, {
-      uri: ''
-    }],
+    cover: "",
+    attachments: [
+      {
+        type: "image",
+      },
+      {
+        length: 234,
+      },
+      {
+        uri: "",
+      },
+    ],
   };
 
   initializeComponent = async () => {
@@ -99,18 +105,18 @@ class Complain extends React.Component {
       quality: 0.4,
       allowsMultipleSelection: true,
       exif: true,
-      
     });
     console.log({ result });
     if (result && !result.cancelled) {
       if (isCover) {
         this.setState({
           imageUrl: result.uri,
+          cover: result.base64,
         });
       } else {
         this.setState((prevState) => ({
           attachments: prevState.attachments.concat([
-            { type: result.type, uri: result.uri },
+            { type: result.type, uri: result.uri, blob: result.base64 },
           ]),
         }));
       }
@@ -144,17 +150,46 @@ class Complain extends React.Component {
   };
 
   onRecordingAudioEnd = async () => {
-    if (!recording)
-      return;
+    if (!recording) return;
     Vibration.vibrate(100);
     await recording.stopAndUnloadAsync();
+    const blob = await fetch(recording._uri);
+    const fileReaderInstance = new FileReader();
+    fileReaderInstance.readAsDataURL(blob._bodyBlob);
+    fileReaderInstance.onload = () => {
+      const base64data = fileReaderInstance.result;
+      this.setState((prevState) => ({
+        attachments: prevState.attachments.concat([
+          {
+            uri: recording._uri,
+            length: recording._finalDurationMillis,
+            blob: base64data,
+          },
+        ]),
+      }));
+    };
     await this.playBackRecording(recording);
-    this.setState((prevState) => ({
-      attachments: prevState.attachments.concat([
-        { uri: recording._uri, length: recording._finalDurationMillis },
-      ]),
-    }));
     recording = null;
+  };
+
+  handleRemoveAttachment = (index) => {
+    const { attachments } = this.state;
+    const newAttachments = JSON.parse(JSON.stringify(attachments));
+    newAttachments.splice(index, 1);
+    this.setState({
+      attachments: newAttachments,
+    });
+    const attachment = attachments[index];
+    ToastAndroid.show(
+      `${
+        attachment.length
+          ? "Audio"
+          : attachment.type === "image"
+          ? "Picture"
+          : "Video"
+      } Deleted !`,
+      ToastAndroid.SHORT
+    );
   };
 
   render() {
@@ -209,19 +244,33 @@ class Complain extends React.Component {
                   <Text>Add File</Text>
                 </View>
               </TouchableOpacity>
-              <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} >
-              {attachments.map((attachment) => (
-                <View style={styles.attachmentButtons}>
-                  {attachment.length ? (
-                    <AudioIcon />
-                  ) : attachment.type ===
-                        "image" ? (
-                    <ImageIcon />
-                  ) : (
-                    <VideoIcon />
-                  )}
-                </View>
-              ))}
+              <ScrollView
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+              >
+                {attachments.map((attachment, index) => (
+                  <TouchableOpacity
+                    onLongPress={() => this.handleRemoveAttachment(index)}
+                    style={styles.attachmentButtons}
+                  >
+                    {attachment.length ? (
+                      <>
+                        <AudioIcon />
+                        <Text>Audio</Text>
+                      </>
+                    ) : attachment.type === "image" ? (
+                      <>
+                        <ImageIcon />
+                        <Text>Picture</Text>
+                      </>
+                    ) : (
+                      <>
+                        <VideoIcon />
+                        <Text>Video</Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+                ))}
               </ScrollView>
             </View>
           </View>
