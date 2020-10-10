@@ -1,15 +1,13 @@
 const express = require("express");
 const authenticate = require("../authenticate");
 const locationModal = require("../models/Location");
-const multer = require("multer");
-const upload = multer();
 
 const fs = require("fs");
 
 const locationRouter = express.Router();
 locationRouter.use(
   express.json({
-    limit: "50mb",
+    limit: "200mb",
   })
 );
 
@@ -91,7 +89,7 @@ locationRouter
   });
 
 locationRouter
-  .route("/setComplaint", upload.single("file"))
+  .route("/setComplaint")
   .post(authenticate.verifyUser, async (req, res) => {
     const {
       body: {

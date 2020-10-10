@@ -24,3 +24,15 @@ export const setComplaint = async (body) => {
        console.log(err)
    }
 }
+
+export const uploadSensorData = async (body) => {
+    const url = `${endpoint}/sensor/saveData`;
+    const headers = await setHeader('POST', { body: JSON.stringify(body) })
+    try{
+        const response = await (await fetch(url, headers)).json()
+        return response.status === 200
+    }
+   catch(err){
+       console.log(err)
+   }
+}

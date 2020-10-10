@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, ScrollView, Text } from 'react-native';
 import { Gyroscope, Magnetometer, Accelerometer } from 'expo-sensors';
-import Constants from "expo-constants";
 import BigButton from '../components/BigButton'
+import Header from '../components/Header';
+import { uploadSensorData } from '../api';
 
 class Sensor extends React.Component {
   state = {
@@ -73,16 +74,23 @@ class Sensor extends React.Component {
     this.stop();
   }
 
+  handleSaveToDB = async () => {
+    this.stop();
+    const status = await uploadSensorData(this.state.data);
+    console.log({ status });
+  }
+
   render() {
     const { data } = this.state
     return (
-      <View style={{ flex: 1, flexDirection: "column", marginTop: Constants.statusBarHeight, marginLeft: 10 }} >
-        <View style={{ flex: 0.8 }} >
+      <View style={{ flex: 1, flexDirection: "column" }} >
+        <Header text="Sensors" {...this.props} />
+        <View style={{ flex: 0.7, marginLeft: 10 }} >
           <ScrollView ref={(ref) => { this.scrollRef=ref}}>
             {
               data.map((ele) => {
                 return (
-                <>
+                <View key={ele[3]}>
                 <Text style={{ fontWeight: 'bold' }} >Gyroscope</Text>
                 <Text>
                   {`x: ${ele[0].x} y: ${ele[0].y} z: ${ele[0].z}`}
@@ -97,14 +105,15 @@ class Sensor extends React.Component {
                 </Text>
                 <Text style={{ fontWeight: 'bold' }} >{`time ${ele[3]}`}</Text>
                 <View style={{ width: '100%', borderBottomWidth: 1, marginVertical: 5 }} />
-                </>
+                </View>
               )})
             }
           </ScrollView>
         </View>
-        <View style={{ flex: 0.2, justifyContent: 'space-around' }} >
+        <View style={{ flex: 0.3, justifyContent: 'space-around' }} >
           <BigButton text="Start" onPress={this.start}  />
           <BigButton text="Stop" onPress={this.stop}  />
+          <BigButton text="Save" onPress={this.handleSaveToDB}  />
         </View>
       </View>
     )
