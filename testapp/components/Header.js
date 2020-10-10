@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Dropdown } from 'react-native-material-dropdown'; 
 import Constants from "expo-constants";
 import { Menu, Filter } from './icons'
-import FilterModal from './filterModal'
 
 const style = StyleSheet.create({
     container: {
@@ -14,16 +13,18 @@ const style = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         paddingLeft: 10,
-        paddingRight: 10    
+        paddingRight: 10,
+        backgroundColor: "#f28800"
     },
     textContainer: {
         display: "flex",
         flex: 1,
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
     },
     text: {
-        fontSize: 17
+        fontSize: 17,
+        color: '#fff',
     },
     options: {
         flex: 1,
@@ -35,12 +36,12 @@ const style = StyleSheet.create({
 export default ({ navigation, text, filterModalOpen, setFilterModalOpen }) => 
         <View style={style.container} >
             <TouchableOpacity onPress={navigation.openDrawer} >
-                <Menu />
+                <Menu fill="#fff" />
             </TouchableOpacity>
             <View style={style.textContainer} >
                 <Text style={style.text} >{text}</Text>
             </View>
-            <TouchableOpacity onPress={()=>setFilterModalOpen(!filterModalOpen)} >
-                <Filter />
-            </TouchableOpacity>
+            { setFilterModalOpen ? <TouchableOpacity onPress={()=>setFilterModalOpen(!filterModalOpen)} >
+                <Filter fill="#fff" />
+            </TouchableOpacity> : <View style={{ width: 40 }} />}
         </View>

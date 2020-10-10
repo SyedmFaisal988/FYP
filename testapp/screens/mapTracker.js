@@ -7,7 +7,7 @@ import {
   View,
   TouchableOpacity,
 } from "react-native";
-import MapView, { Marker, Polyline, Callout } from "react-native-maps";
+import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import Loader from "../components/loader";
@@ -71,13 +71,11 @@ class Maptracker extends Component {
       "focus",
       async () => {
         const data = await getLocationData();
-        console.log({data})
         const formatedData = this.mapData(data);
         this.setState({ imageMarker: formatedData, displayData: formatedData });
         for (var i = 0; i < formatedData.length; i++) {
           await this.fetchImages(formatedData[i], i);
         }
-        console.log('fet')
         await this.getCurrentPosition();
         console.log(false)
         return this.setState({ loading: false });
@@ -344,6 +342,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
     borderWidth: 2,
     backgroundColor: '#fff',
+    borderColor: 'grey',
     overflow: 'hidden'
   },
   optionWrapper: {

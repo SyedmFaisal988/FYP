@@ -18,8 +18,6 @@ class Login extends Component {
         password: "",
         loading: false
     }
-    KeyboardDidShow = null
-    scrollRef = null
 
     handleLogin = async () => {
         await this.setState({ loading: true })
@@ -34,27 +32,11 @@ class Login extends Component {
         return Alert.alert('Ops', "Invalid User name or password")
     }
 
-    componentDidMount(){
-        console.log("login")
-        this.KeyboardDidShow = Keyboard.addListener(
-            "keyboardDidShow",
-            ()=>{
-                setTimeout(()=>{
-                    this.scrollRef.scrollToEnd({animated: true, duration: 500});
-                }, 50)
-            }
-        )
-    }
-
-    componentWillUnmount(){
-        this.KeyboardDidShow.remove()
-    }
-
     render() {
         const { username, password, loading } = this.state;
         return (
-            <ScrollView ref={ref => this.scrollRef = ref} >
             <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }} enabled >
+                <ScrollView >
                 <StatusBar backgroundColor="black" barStyle="light-content" />
                 <LoadingScreen loading={loading}/>
                 <SafeAreaView style={{ height: height  }}>
@@ -103,8 +85,8 @@ class Login extends Component {
                         </View>
                     </View>
                 </SafeAreaView>
-            </KeyboardAvoidingView>
             </ScrollView>
+            </KeyboardAvoidingView>
         )
     }
 }
