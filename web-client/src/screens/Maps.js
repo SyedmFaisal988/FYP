@@ -70,7 +70,7 @@ class Maps extends Component {
       <div style={{ height: "calc(100vh - 64px)", width: "100%" }}>
         <AppBarComponent title="Maps" />
         <GoogleMapReact
-          bootstrapURLKeys={{ key: "AIzaSyBXWuCYSYQ886FGEsscmc5NQNA6bLrkyec" }}
+          bootstrapURLKeys={{ key: "AIzaSyDGjcZ0QEmP4pcyWhabtNe3VY2pNi-jstA" }}
           defaultCenter={center}
           defaultZoom={zoom}
           onChange={( props ) => {

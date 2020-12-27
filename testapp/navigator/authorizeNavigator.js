@@ -11,7 +11,7 @@ import { NavigationContainer } from '@react-navigation/native';
 const Drawer = createDrawerNavigator();
 
 export default (parentProps) => <NavigationContainer>
-    <Drawer.Navigator  initialRouteName="Sensor">
+    <Drawer.Navigator  initialRouteName="Marker">
         <Drawer.Screen name="Marker" component={mapTracker}/>
         <Drawer.Screen name="Camera" component={Camera} />
         <Drawer.Screen name="Complain" component={Complain} />

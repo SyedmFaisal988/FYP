@@ -90,32 +90,28 @@ class Complain extends React.Component {
     attachments: [],
     options: [
       {
-        name: "Fruits",
+        name: "Sindh Departments",
         id: "0",
         children: [
           {
-            name: "Apple",
+            name: "KU",
             id: "00",
           },
           {
-            name: "Strawberry",
+            name: "KMC",
             id: "01",
           },
           {
-            name: "Pineapple",
+            name: "K.E",
             id: "02",
           },
           {
-            name: "Banana",
+            name: "C.B",
             id: "03",
           },
           {
-            name: "Watermelon",
+            name: "NHA",
             id: "04",
-          },
-          {
-            name: "Kiwi fruit",
-            id: "05",
           },
         ],
       },
