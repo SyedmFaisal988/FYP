@@ -12,7 +12,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row', 
         height: height*0.06,
         borderRadius: 70,
-        backgroundColor: "#fff"
+        backgroundColor: "#fff",
+        minWidth: '50%'
     },
     TextInputStlye: {
         color: "#00000080",

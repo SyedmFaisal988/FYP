@@ -1,4 +1,5 @@
 const express = require("express");
+const crowdModal = require("../models/Crowd");
 const authenticate = require("../authenticate");
 const locationModal = require("../models/Location");
 
@@ -52,7 +53,6 @@ locationRouter
           });
         });
     } catch (err) {
-      console.log({ err });
       res.statusCode = 500;
       res.json({
         status: false,
@@ -73,20 +73,44 @@ locationRouter
         { $push: { cords: { ...point, created: new Date() } } }
       )
       .then((resp) => {
-        console.log({ success: "success" });
         res.json({
           status: 200,
           message: "added successfully",
         });
       })
       .catch((err) => {
-        console.log({ err });
         return res.json({
           status: 500,
           message: "Something went wrong",
         });
       });
   });
+
+locationRouter.route('/setCrowdData').post(authenticate.verifyUser, async (req, res) => {
+  const {
+    body: {
+      cover,
+      quality,
+      latitude,
+      longitude,
+      description,
+      selectedItems,
+    },
+  } = req;
+  const base64Data = cover.replace(/^data:image\/png;base64,/, "");
+  const coverName = `${new Date().valueOf()}.jpg`;
+  await fs.writeFileSync(`./images/${coverName}`, base64Data, "base64");
+  await crowdModal.create({
+    image: coverName,
+    quality,
+    latitude,
+    longitude,
+    description,
+    selectedItems,
+    created: new Date(),
+    userId: req.user._id,
+  });
+})
 
 locationRouter
   .route("/setComplaint")
@@ -142,14 +166,12 @@ locationRouter
         );
       })
       .then((resp) => {
-        console.log({ success: "success" });
         res.json({
           status: 200,
           message: "added successfully",
         });
       })
       .catch((err) => {
-        console.log({ err });
         return res.json({
           status: 500,
           message: "Something went wrong",
@@ -166,7 +188,6 @@ locationRouter
         status,
       },
     } = req;
-    console.log({ status, point, id });
     const locationData = await locationModal.findById(id).lean();
     const updatePointIndex = locationData.cords.findIndex(
       (ele) => ele.id === point.id
@@ -179,7 +200,6 @@ locationRouter
       const resp = await locationModal.findByIdAndUpdate(id, {
         $set: { cords: updatedCords },
       });
-      console.log({ resp });
       return res.json({
         status: 200,
         message: "operation successfull",
