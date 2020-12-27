@@ -130,7 +130,7 @@ locationRouter
               cords: {
                 subject,
                 description,
-                selectedItems,
+                selectedItems: selectedItems.join(';'),
                 latitude,
                 image: coverName,
                 attachments: attachmentsName,

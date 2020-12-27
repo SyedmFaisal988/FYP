@@ -41,6 +41,10 @@ const CordsSchema = new Schema({
     created: {
         type: Date,
         required: false
+    },
+    selectedItems: {
+        type: String,
+        required: false,
     }
 })
 
