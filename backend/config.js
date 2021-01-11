@@ -1,4 +1,4 @@
-exports.hostName = process.env.PORT? '0.0.0.0' : '192.168.4.103'
+exports.hostName = process.env.PORT? '0.0.0.0' : '192.168.4.104'
 exports.port = process.env.PORT || 4000
 exports.db_url =  "mongodb://localhost:27017"  
 exports.db_name = "location"

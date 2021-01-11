@@ -86,6 +86,26 @@ locationRouter
       });
   });
 
+  locationRouter.route('/getCrowdData').get(authenticate.verifyUser, async (req, res) => {
+    crowdModal.find({}).then((resp) => {
+      const data = [];
+      resp.forEach(ele => {
+        const { description, image, quality, selectedItems, id } = ele;
+        data.push({ description, image, quality, selectedItems, id });
+      })
+      res.statusCode = 200;
+      res.json(data)
+    })
+    .catch(err => {
+      res.statusCode = 500;
+      res.json({
+        status: 500,
+        message: "Something went wrong",
+      });
+      console.log('err', err)
+    })
+  })
+
 locationRouter.route('/setCrowdData').post(authenticate.verifyUser, async (req, res) => {
   const {
     body: {

@@ -15,7 +15,15 @@ const updateStatus = async (inputData) => {
   return response.json()
 }
 
+const getCrowdData = async () => {
+  const url = `${REST_API}/location/getCrowdData`
+  const headers = setHeader('GET')
+  const response = await fetch(url, headers)
+  return response.json()
+}
+ 
 export {
   updateStatus,
-  getLocationData
+  getLocationData,
+  getCrowdData
 }
