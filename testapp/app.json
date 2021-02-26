@@ -3,7 +3,7 @@
     "name": "testapp",
     "slug": "testapp",
     "privacy": "public",
-    "sdkVersion": "36.0.0",
+    "sdkVersion": "37.0.0",
     "platforms": [
       "ios",
       "android",
@@ -26,7 +26,7 @@
     "ios": {
       "supportsTablet": true
     },
-    "android":{
+    "android": {
       "package": "com.testapp.testapp"
     }
   }
