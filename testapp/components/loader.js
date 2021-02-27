@@ -4,10 +4,10 @@ import { LinearGradient } from 'expo-linear-gradient'
 
 const splash = require('../assets/icon.png')
 
-export default loader = (props) => (
+export default loader = ({loading}) => (
     <Modal
         animationType="none"
-        visible={props.loading}
+        visible={loading}
     >
         <LinearGradient
             colors={["#f28800", "#f15e00"]}

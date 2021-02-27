@@ -44,3 +44,14 @@ exports.verifyAdmin = (req, res, next) => {
         next()
     }
 }
+
+exports.verifyEmployee = (req, res, next) => {
+    const { user: { type } } = req
+    if(type !== 'EMPLOYEE'){
+        res.statusCode = 401;
+        res.setHeader('Content-Type', 'application/json')
+        res.json({ success: false, message: 'Invalid credentials' })
+    }else{
+        next()
+    }
+}

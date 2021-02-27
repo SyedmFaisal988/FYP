@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     }
 })
 
-const InputField = ({placeholder, value, onChange, children, secureTextEntry, multiline, customStyle = {}})=>{
+const InputField = ({placeholder, value, onChange, children, secureTextEntry, multiline, customStyle = {}, keyboardType="default"})=>{
     return(
         <View style={multiline ? [styles.inputWrapper, { borderRadius: 15, height: 100 }] : styles.inputWrapper} >
             {children && <View style={{ flex: 0.2, justifyContent: 'center', alignItems: 'center', paddingTop: 10, paddingLeft: 10 }} >
@@ -30,13 +30,14 @@ const InputField = ({placeholder, value, onChange, children, secureTextEntry, mu
             </View>}
             <View style={{flex: 0.8 , justifyContent: 'center', paddingLeft: children ? 10 : 30, marginTop: children ? 0 : 0 }} >
                 <TextInput
-                    placeholder={placeholder}
-                    placeholderTextColor={"#00000080"}
-                    style={[styles.TextInputStlye, customStyle]}
                     multiline={multiline}
-                    secureTextEntry={secureTextEntry ? true : false}
-                    onChangeText={(value)=>onChange(value)}
                     value={value.toString()}
+                    placeholder={placeholder}
+                    keyboardType={keyboardType}
+                    placeholderTextColor={"#00000080"}
+                    onChangeText={(value)=>onChange(value)}
+                    style={[styles.TextInputStlye, customStyle]}
+                    secureTextEntry={secureTextEntry ? true : false}
                 />
             </View>
         </View>

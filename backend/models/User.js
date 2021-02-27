@@ -13,10 +13,24 @@ const userSchema = new Schema({
         required: true,
         default: ''
     },
+    address: {
+        type: String,
+        required: true,
+        default: ''
+    },
+    rewardPoint: {
+        default: 0,
+        type: Number,
+        required: true,
+    },
     isadmin: {
         type: Boolean,
         required: true,
         default: false
+    },
+    type: {
+        type: String,
+        default: 'USER'
     }
 })
 

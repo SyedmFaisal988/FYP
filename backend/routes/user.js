@@ -10,7 +10,7 @@ userRouter.use(express.json())
 
 userRouter.route('/signup').post(async (req, res)=>{
     console.log('hit')
-    const { body: { username, password, email } } = req
+    const { body: { username, password, email, address } } = req
     try {
         const user = await User.findOne({ email });
         if(user){
@@ -20,6 +20,7 @@ userRouter.route('/signup').post(async (req, res)=>{
         }else{
             const newUser = await User.register(new User({
                 username,
+                address,
                 email,
             }), password)
             await locationModal.create({ userId: newUser._id.toString(), cords: [] })

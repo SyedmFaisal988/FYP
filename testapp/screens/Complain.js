@@ -291,7 +291,7 @@ class Complain extends React.Component {
       selectedItems,
     } = this.state;
     return (
-      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }} enabled>
+      <>
         <Header text="Complain" {...this.props} />
         <Modal
           animationType="slide"
@@ -454,7 +454,7 @@ class Complain extends React.Component {
           <SubmitButton text="Submit" onPress={this.handleSubmit} />
           <View style={{ marginBottom: 15 }} />
         </ScrollView>
-      </KeyboardAvoidingView>
+        </>
     );
   }
 }
