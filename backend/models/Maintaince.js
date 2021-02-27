@@ -30,4 +30,4 @@ const maintainceSchema = new Schema({
   timestamps: true
 })
 
-module.exports = mongoose.model('Maintances', maintainceSchema)
+module.exports = mongoose.model('maintances', maintainceSchema)

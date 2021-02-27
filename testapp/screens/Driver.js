@@ -54,7 +54,7 @@ class Driver extends Component {
       return Alert.alert("Validation error", "All fields are required");
     }
 
-    if (typeof +type1Amount === 'number' || typeof +type2Amount === 'number' || typeof +type3Amount === 'number' || typeof +type4Amount === 'number' ) {
+    if (typeof +type1Amount !== 'number' || typeof +type2Amount !== 'number' || typeof +type3Amount !== 'number' || typeof +type4Amount !== 'number' ) {
       this.setState({ loading: false });
       return Alert.alert("Validation error", "Quantity needs to be numeric value");
     } 
