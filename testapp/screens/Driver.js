@@ -9,7 +9,7 @@ import {
   Alert,
 } from "react-native";
 
-import { setMaintaince } from "../api";
+import { setMaintaince, getUser } from "../api";
 import Header from "../components/Header";
 import Loader from "../components/loader";
 import InputField from "../components/InputFields";
@@ -36,14 +36,36 @@ class Driver extends Component {
     this.setState({ [key]: value });
   };
 
+  componentDidMount() {
+    const {route: {params: {userId}}} = this.props;
+    getUser({
+      userId
+    }).then(res => {
+      if (res.status !== 200) {
+        throw 'Something went wrong';
+      }
+      const { message: {
+        address
+      } } = res
+      this.setState({
+        houseNo: address
+      })
+    }).catch(err => {
+      console.log('err', err)
+      Alert.alert('Error', err)
+    })
+  }
+
   handleSubmit = async () => {
     await this.setState({ loading: true });
+    const {route: {params: {_id, coords}}} = this.props;
+
     const {
-      houseNo,
       type1,
       type2,
       type3,
       type4,
+      houseNo,
       type1Amount,
       type2Amount,
       type3Amount,
@@ -58,8 +80,11 @@ class Driver extends Component {
       this.setState({ loading: false });
       return Alert.alert("Validation error", "Quantity needs to be numeric value");
     } 
+    console.log('ab jae ga')
     const response = await setMaintaince({
       houseNo,
+      point: coords,
+      userId: _id,
       type1: `${type1};${type1Amount}`,
       type2: `${type2};${type2Amount}`,
       type3: `${type3};${type3Amount}`,
@@ -87,6 +112,8 @@ class Driver extends Component {
       type3Amount,
       type4Amount,
     } = this.state;
+
+    console.log(this.props)
     return (
       <>
         <Header text="Pick Up" {...this.props} />
@@ -113,17 +140,6 @@ class Driver extends Component {
               placeholder="Enter quantity"
               onChange={(value) => this.handleChangeInput("type1Amount", value)}
             />
-            <View style={{ marginBottom: 15 }} />
-            <Text style={styles.labelText}>Unit</Text>
-            <Picker
-              selectedValue={type1}
-              style={{ height: 50, width: width - 20 }}
-              onValueChange={(itemValue) => this.setState({ type1: itemValue })}
-            >
-              <Picker.Item label="K.G" value="kg" />
-              <Picker.Item label="Pound" value="pound" />
-              <Picker.Item label="Ton" value="ton" />
-            </Picker>
 
             <View style={{ marginBottom: 15 }} />
             <Text style={styles.labelText}>Type 2</Text>
@@ -135,17 +151,6 @@ class Driver extends Component {
               placeholder="Enter quantity"
               onChange={(value) => this.handleChangeInput("type2Amount", value)}
             />
-            <View style={{ marginBottom: 15 }} />
-            <Text style={styles.labelText}>Unit</Text>
-            <Picker
-              selectedValue={type2}
-              style={{ height: 50, width: width - 20 }}
-              onValueChange={(itemValue) => this.setState({ type2: itemValue })}
-            >
-              <Picker.Item label="K.G" value="kg" />
-              <Picker.Item label="Pound" value="pound" />
-              <Picker.Item label="Ton" value="ton" />
-            </Picker>
 
             <View style={{ marginBottom: 15 }} />
             <Text style={styles.labelText}>Type 3</Text>
@@ -157,17 +162,6 @@ class Driver extends Component {
               placeholder="Enter quantity"
               onChange={(value) => this.handleChangeInput("type3Amount", value)}
             />
-            <View style={{ marginBottom: 15 }} />
-            <Text style={styles.labelText}>Unit</Text>
-            <Picker
-              selectedValue={type3}
-              style={{ height: 50, width: width - 20 }}
-              onValueChange={(itemValue) => this.setState({ type3: itemValue })}
-            >
-              <Picker.Item label="K.G" value="kg" />
-              <Picker.Item label="Pound" value="pound" />
-              <Picker.Item label="Ton" value="ton" />
-            </Picker>
 
             <View style={{ marginBottom: 15 }} />
             <Text style={styles.labelText}>Type 4</Text>
@@ -179,17 +173,6 @@ class Driver extends Component {
               placeholder="Enter quantity"
               onChange={(value) => this.handleChangeInput("type4Amount", value)}
             />
-            <View style={{ marginBottom: 15 }} />
-            <Text style={styles.labelText}>Unit</Text>
-            <Picker
-              selectedValue={type4}
-              style={{ height: 50, width: width - 20 }}
-              onValueChange={(itemValue) => this.setState({ type4: itemValue })}
-            >
-              <Picker.Item label="K.G" value="kg" />
-              <Picker.Item label="Pound" value="pound" />
-              <Picker.Item label="Ton" value="ton" />
-            </Picker>
           </View>
           <View style={{ marginBottom: 15 }} />
           <SubmitButton text="Submit" onPress={this.handleSubmit} />

@@ -40,6 +40,8 @@ class Login extends Component {
         "token",
         JSON.stringify(response.token.replace(/"/g, ""))
       );
+      AsyncStorage.setItem('user', JSON.stringify(response));
+      console.log('response', response)
       await this.setState({ loading: false, username: "", password: "" });
       return this.props.navigation.navigate("authorizeNavigator");
     }

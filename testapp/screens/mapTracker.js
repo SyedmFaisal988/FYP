@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import {
   StyleSheet,
   SafeAreaView,
+  AsyncStorage,
   Text,
   Image,
   View,
@@ -19,22 +20,30 @@ import { Context } from '../context'
 
 class Maptracker extends Component {
   state = {
-    customMarker: [],
-    timestamp: new Date().valueOf(),
     test: false,
-    cameraStatus: null,
-    imageMarker: [],
-    loading: true,
-    filterModalOpen: false,
     filter: "all",
-    displayData: []
+    loading: true,
+    displayData: [],
+    imageMarker: [],
+    customMarker: [],
+    cameraStatus: null,
+    filterModalOpen: false,
+    timestamp: new Date().valueOf(),
+    user: {},
   };
   coordinate = [];
   PositionWatcher = null;
   navigationListener = null;
 
-  mapData = (data) =>
-    data.message.cords.map((ele) => ({
+  mapData = (data) => {
+  this.setState({
+    user: {
+      ...this.state.user,
+      userId: data.message.userId,
+      _id: data.message._id
+    }
+  })
+    return data.message.cords.map((ele) => ({
       coords: {
         ...ele,
         latitudeDelta: 0.0922,
@@ -42,7 +51,7 @@ class Maptracker extends Component {
       },
       uri: `${endpoint}/images/${ele.image}`,
     }));
-
+}
   onRegionChange = (mapRegion) => {
     const data = {
       coords: mapRegion,
@@ -54,7 +63,6 @@ class Maptracker extends Component {
   };
 
   fetchImages = async (image, index) => {
-    console.log({ image })
     const blob = await fetch(image.uri);
     const fileReaderInstance = new FileReader();
     fileReaderInstance.readAsDataURL(blob._bodyBlob);
@@ -67,6 +75,11 @@ class Maptracker extends Component {
   };
 
   componentDidMount() {
+    AsyncStorage.getItem('user').then(res => {
+      this.setState({
+        user: JSON.parse(res),
+      })
+    })
     this.navigationListener = this.props.navigation.addListener(
       "focus",
       async () => {
@@ -222,7 +235,7 @@ class Maptracker extends Component {
 
   render() {
     const {
-      customMarker,
+      user,
       displayData,
       loading,
       filterModalOpen,
@@ -230,7 +243,6 @@ class Maptracker extends Component {
     } = this.state;
     const { context: { mapRegion } } = this.props
     let data = ["All", "Pending", "Processing", "Solved"];
-    console.log("aya")
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <Header
@@ -254,7 +266,12 @@ class Maptracker extends Component {
                   index={index.toString()}
                   coordinate={ele.coords}
                 >
-                  <Callout style={{ flex: -1 }}>
+                  <Callout onPress={() => {
+                    if (user.isAdmin) {
+                      this.props.navigation.navigate('Driver', {...ele, userId: user.userId, _id: user._id})
+                    }
+                    return;
+                  }} style={{ flex: -1 }}>
                     <Text style={{ flexDirection: "column", marginTop: -95 }}>
                       <Image
                         style={{ height: 200, width: 200 }}

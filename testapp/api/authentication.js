@@ -30,6 +30,15 @@ const check = async ()=>{
     return response.json()
 }
 
+
+const getUser = async (body)=>{
+    const url = `${endpoint}/users/get`
+    console.log({ url })
+    const headers = await setHeader('POST', {body: JSON.stringify(body)});
+    const response = await fetch(url, headers)
+    return response.json()
+}
+
 const signup = async (inputData) => {
     const url = `${endpoint}/users/signup`
     const response = await fetch(url, {
@@ -43,4 +52,4 @@ const signup = async (inputData) => {
     return response.json()
 }
 
-export { logIn, check, signup }
+export { logIn, check, signup, getUser }

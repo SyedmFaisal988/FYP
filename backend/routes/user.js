@@ -2,7 +2,8 @@ const express = require('express');
 const passport = require('passport');
 const authenticate = require('../authenticate')
 const User = require('../models/User')
-const locationModal = require('../models/Location')
+const locationModal = require('../models/Location');
+const { json } = require('express');
 
 const userRouter = express.Router();
 userRouter.use(express.json())
@@ -37,13 +38,28 @@ userRouter.route('/signup').post(async (req, res)=>{
     }
 })
 
+userRouter.route('/get').post(authenticate.verifyUser, authenticate.verifyEmployee, (req, res) => {
+    const {body: {userId}} = req
+    User.findById(userId).then(user => {
+        res.json({
+            status: 200,
+            message: user,
+        })
+    }).catch(err => {
+        res.json({
+            status: 500,
+            message: 'Internal server error'
+        })
+    })
+})
+
 userRouter.route('/login')
 .post((req, res)=>{
     console.log('aya')
     passport.authenticate('local')(req, res, ()=>{
         const token = authenticate.getToken({ _id: req.user._id })
         res.statusCode = 200
-        return res.json({ token: token, success: true })
+        return res.json({ token: token, success: true, isAdmin: req.user.isadmin })
     })
   
 })

@@ -5,7 +5,6 @@ import Loader from '../components/loader'
 export default ({ parentProps: { navigation: { dispatch, navigate } } }) => {
 
     useEffect(()=> {
-        console.log(dispatch)
         AsyncStorage.removeItem('token').then(()=>{
             navigate('unAuthorizeNavigator')
         })

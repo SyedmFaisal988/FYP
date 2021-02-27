@@ -3,6 +3,7 @@ const userModal = require("../models/User");
 const authenticate = require("../authenticate");
 const VehicleModal = require("../models/Vehicle");
 const ExpenseModal = require("../models/Expenses");
+const locationModal = require('../models/Location');
 const MantainceModal = require("../models/Maintaince");
 
 const maintainceRouter = express.Router();
@@ -10,10 +11,29 @@ maintainceRouter.use(express.json());
 
 maintainceRouter
   .route("/setMaintaince")
-  .post(authenticate.verifyUser, authenticate.verifyEmployee, (req, res) => {
+  .post(authenticate.verifyUser, authenticate.verifyEmployee, async (req, res) => {
     const {
-      body: { houseNo, type1, type2, type3, type4 },
+      body: { houseNo, type1, type2, type3, type4, userId, point },
     } = req;
+    console.log(houseNo, type1, type2, type3, type4, userId, point.id, point._id)
+    if (userId) {
+      const locationData = await locationModal.findById(userId).lean();
+      console.log(locationData.cords[0], locationData.cords[0]._id, JSON.stringify(locationData.cords[0]._id).replace(/"/g,''), 'ASD')
+      const updatePointIndex = locationData.cords.findIndex(
+        (ele) => JSON.stringify(locationData.cords[0]._id).replace(/"/g,'') === point._id
+      );
+      console.log('index', updatePointIndex)
+      if (updatePointIndex >= 0) {
+        point.processing = new Date();
+        point.complete = new Date();
+        const updatedCords = locationData.cords;
+        updatedCords[updatePointIndex] = point;
+        const resp = await locationModal.findByIdAndUpdate(userId, {
+          $set: { cords: updatedCords },
+        });
+        console.log('resp', resp)
+      }
+    }
     userModal
       .findOne({ address: houseNo })
       .then((user) => {
