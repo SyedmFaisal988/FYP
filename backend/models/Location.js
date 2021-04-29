@@ -45,6 +45,10 @@ const CordsSchema = new Schema({
     selectedItems: {
         type: String,
         required: false,
+    },
+    employeeId: {
+        type: String,
+        required: false,
     }
 })
 

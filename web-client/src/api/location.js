@@ -21,9 +21,17 @@ const getCrowdData = async () => {
   const response = await fetch(url, headers)
   return response.json()
 }
+
+const getDashboardData = async () => {
+  const url = `${REST_API}/location/getDashboardData`
+  const headers = setHeader('GET')
+  const response = await fetch(url, headers)
+  return response.json()
+}
  
 export {
   updateStatus,
   getLocationData,
-  getCrowdData
+  getCrowdData,
+  getDashboardData
 }

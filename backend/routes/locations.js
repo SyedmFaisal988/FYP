@@ -2,6 +2,7 @@ const express = require("express");
 const crowdModal = require("../models/Crowd");
 const authenticate = require("../authenticate");
 const locationModal = require("../models/Location");
+const UserModal = require('../models/User');
 
 const fs = require("fs");
 
@@ -33,6 +34,44 @@ locationRouter
       message: `${name}.jpg`,
     });
   });
+
+  locationRouter.route('/getDashboardData').get(authenticate.verifyUser, async (req, res) => {
+    locationModal.find({}).then((resp) => {
+      const filterData = resp ? resp.filter(ele => ele.cords.length) : [];
+      const formatedData = [];
+      filterData.forEach((ele) => {
+        ele.cords.forEach((elem) => {
+          formatedData.push({
+            userId: ele.userId,
+            ...elem._doc,
+          })
+        })
+      })
+      const promises = formatedData.map(async (record) => {
+        const data = await UserModal.findById(record.userId);
+        const employeeData = await UserModal.findById(record.employeeId)
+        return [data, employeeData];
+      })
+      Promise.all(promises).then((response) => {
+        res.statusCode = 200;
+        res.json({
+          status: true,
+          message: formatedData.map((ele, index) => ({
+            ...ele,
+            user: response[index][0],
+            employee: response[index][1]
+          }))
+        })
+      })
+    })
+    .catch(err => {
+      res.statusCode = 500;
+      res.json({
+        status: false,
+        message: err
+      })
+    })
+  })
 
 locationRouter
   .route("/getLocationData")
