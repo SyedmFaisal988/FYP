@@ -42,12 +42,13 @@ locationRouter
     } = req;
     try {
       locationModal
-        .findOne(isAdmin ? {} : { userId: req.user._id })
+        .find(isAdmin ? {} : { userId: req.user._id })
         .then((resp) => {
+          const filterData = resp.filter(ele => ele.cords.length)
           res.statusCode = 200;
           return res.json({
             status: true,
-            message: resp || {
+            message: filterData || {
               cords: [],
             },
           });

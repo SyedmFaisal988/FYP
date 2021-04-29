@@ -10,7 +10,6 @@ export default Start = (props) => {
             console.log({ token })
             if (token) {
                 const response = await check()
-                console.log({ response })
                 if (response.success) {
                     const resetAction = StackActions.reset({
                         index: 0,

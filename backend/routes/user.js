@@ -41,11 +41,13 @@ userRouter.route('/signup').post(async (req, res)=>{
 userRouter.route('/get').post(authenticate.verifyUser, authenticate.verifyEmployee, (req, res) => {
     const {body: {userId}} = req
     User.findById(userId).then(user => {
+        console.log('user', user)
         res.json({
             status: 200,
             message: user,
         })
     }).catch(err => {
+        console.log(err, 'a')
         res.json({
             status: 500,
             message: 'Internal server error'

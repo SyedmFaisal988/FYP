@@ -38,11 +38,12 @@ class Register extends Component {
       password,
       address,
     });
+    console.log('res', response)
     if (response.success) {
       this.props.navigation.navigate("Start");
       return this.setState({ loading: false });
     } else {
-      alert(response.messag || "Something went wrong");
+      alert(response.message || "Something went wrong");
       return this.setState({ loading: false });
     }
   };

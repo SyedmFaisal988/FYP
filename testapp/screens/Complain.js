@@ -5,7 +5,7 @@ import {
   Image,
   TouchableOpacity,
   Text,
-  KeyboardAvoidingView,
+  Alert,
   ScrollView,
   Vibration,
   ToastAndroid,
@@ -277,7 +277,9 @@ class Complain extends React.Component {
       latitude,
       longitude,
     });
-    console.log({ status });
+    if (status) {
+      Alert.alert('Success', 'Complain added successfully')
+    }
   };
 
   render() {

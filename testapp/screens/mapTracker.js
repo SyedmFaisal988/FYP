@@ -16,7 +16,7 @@ import Header from "../components/Header";
 import { getLocationData } from "../api";
 import { endpoint } from "../constants";
 import { Check } from "../components/icons";
-import { Context } from '../context'
+import { Context } from "../context";
 
 class Maptracker extends Component {
   state = {
@@ -36,30 +36,34 @@ class Maptracker extends Component {
   navigationListener = null;
 
   mapData = (data) => {
-  this.setState({
-    user: {
-      ...this.state.user,
-      userId: data.message.userId,
-      _id: data.message._id
-    }
-  })
-    return data.message.cords.map((ele) => ({
-      coords: {
-        ...ele,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      },
-      uri: `${endpoint}/images/${ele.image}`,
-    }));
-}
+    const newData = [];
+    data.message.map((message) => {
+      message.cords.map((ele) => {
+        newData.push({
+          coords: {
+            ...ele,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          },
+          uri: `${endpoint}/images/${ele.image}`,
+          userId: message.userId,
+          _id: message._id,
+        });
+      });
+    });
+    console.log({newData})
+    return newData;
+  };
   onRegionChange = (mapRegion) => {
     const data = {
       coords: mapRegion,
     };
     this.state.test && this.calculateCordinated(data);
     this.setState({ mapRegion });
-    const { context: { setMapRegion } } = this.props
-    setMapRegion(mapRegion)
+    const {
+      context: { setMapRegion },
+    } = this.props;
+    setMapRegion(mapRegion);
   };
 
   fetchImages = async (image, index) => {
@@ -75,22 +79,54 @@ class Maptracker extends Component {
   };
 
   componentDidMount() {
-    AsyncStorage.getItem('user').then(res => {
+    AsyncStorage.getItem("user").then((res) => {
       this.setState({
         user: JSON.parse(res),
-      })
-    })
+      });
+    });
     this.navigationListener = this.props.navigation.addListener(
       "focus",
       async () => {
         const data = await getLocationData();
+        console.log(data);
         const formatedData = this.mapData(data);
         this.setState({ imageMarker: formatedData, displayData: formatedData });
         for (var i = 0; i < formatedData.length; i++) {
           await this.fetchImages(formatedData[i], i);
         }
-        await this.getCurrentPosition();
-        console.log(false)
+        // await this.getCurrentPosition();
+        this.setState({
+          mapRegion: {
+            latitude: 24.94825775410009,
+            longitude: 67.12399939075112,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          },
+        });
+        this.coordinate.push({
+          latitude: 24.94825775410009,
+          longitude: 67.12399939075112,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        });
+        // this.setState({
+        //   mapRegion: {
+        //     latitude: res.coords.latitude,
+        //     longitude: res.coords.longitude,
+        //     latitudeDelta: 0.0922,
+        //     longitudeDelta: 0.0421,
+        //   },
+        // });
+        const {
+          context: { setMapRegion },
+        } = this.props;
+        setMapRegion({
+          latitude: 24.94825775410009,
+          longitude: 67.12399939075112,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        });
+        console.log(false);
         return this.setState({ loading: false });
       }
     );
@@ -118,21 +154,23 @@ class Maptracker extends Component {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         });
-        this.setState({
-          mapRegion: {
-            latitude: res.coords.latitude,
-            longitude: res.coords.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          },
-        });
-        const { context: { setMapRegion } } = this.props
+        // this.setState({
+        //   mapRegion: {
+        //     latitude: res.coords.latitude,
+        //     longitude: res.coords.longitude,
+        //     latitudeDelta: 0.0922,
+        //     longitudeDelta: 0.0421,
+        //   },
+        // });
+        const {
+          context: { setMapRegion },
+        } = this.props;
         setMapRegion({
           latitude: res.coords.latitude,
           longitude: res.coords.longitude,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
-        })
+        });
       });
     }
   };
@@ -207,42 +245,39 @@ class Maptracker extends Component {
   };
 
   onChangeFilter = (value) => {
-    const filter = value.toLowerCase()
-    const { imageMarker } = this.state
-    let displayData = []
-    switch(filter){
-      case 'all':
-          displayData = imageMarker
+    const filter = value.toLowerCase();
+    const { imageMarker } = this.state;
+    let displayData = [];
+    switch (filter) {
+      case "all":
+        displayData = imageMarker;
         break;
-        case 'pending':
-          displayData = imageMarker.filter(ele => !ele.coords.processing)
-          break;
-        case 'processing':
-          displayData = imageMarker.filter(ele => {
-            return !ele.coords.complete && ele.coords.processing
-          })
-          break;
-        case 'solved':
-          displayData = imageMarker.filter(ele => Boolean(ele.coords.complete))
-          break;
+      case "pending":
+        displayData = imageMarker.filter((ele) => !ele.coords.processing);
+        break;
+      case "processing":
+        displayData = imageMarker.filter((ele) => {
+          return !ele.coords.complete && ele.coords.processing;
+        });
+        break;
+      case "solved":
+        displayData = imageMarker.filter((ele) => Boolean(ele.coords.complete));
+        break;
     }
     this.setState({
       filter,
       filterModalOpen: false,
-      displayData
-    })
-  }
+      displayData,
+    });
+  };
 
   render() {
+    const { user, displayData, loading, filterModalOpen, filter } = this.state;
     const {
-      user,
-      displayData,
-      loading,
-      filterModalOpen,
-      filter,
-    } = this.state;
-    const { context: { mapRegion } } = this.props
+      context: { mapRegion },
+    } = this.props;
     let data = ["All", "Pending", "Processing", "Solved"];
+    console.log(displayData)
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <Header
@@ -266,12 +301,19 @@ class Maptracker extends Component {
                   index={index.toString()}
                   coordinate={ele.coords}
                 >
-                  <Callout onPress={() => {
-                    if (user.isAdmin) {
-                      this.props.navigation.navigate('Driver', {...ele, userId: user.userId, _id: user._id})
-                    }
-                    return;
-                  }} style={{ flex: -1 }}>
+                  <Callout
+                    onPress={() => {
+                      if (user.isAdmin) {
+                        this.props.navigation.navigate("Driver", {
+                          ...ele,
+                          userId: ele.userId,
+                          _id: ele._id,
+                        });
+                      }
+                      return;
+                    }}
+                    style={{ flex: -1 }}
+                  >
                     <Text style={{ flexDirection: "column", marginTop: -95 }}>
                       <Image
                         style={{ height: 200, width: 200 }}
@@ -303,7 +345,12 @@ class Maptracker extends Component {
         ) : (
           <></>
         )}
-        <View style={[styles.optionContainer, filterModalOpen ? {} : {  height: 0, borderWidth: 0 } ]}>
+        <View
+          style={[
+            styles.optionContainer,
+            filterModalOpen ? {} : { height: 0, borderWidth: 0 },
+          ]}
+        >
           {data.map((ele, index) => (
             <View
               key={index.toString()}
@@ -313,8 +360,7 @@ class Maptracker extends Component {
               ]}
             >
               <TouchableOpacity
-                onPress={() => this.onChangeFilter(ele)
-                }
+                onPress={() => this.onChangeFilter(ele)}
                 style={styles.optionWrapper}
               >
                 <>
@@ -358,21 +404,21 @@ const styles = StyleSheet.create({
     top: 65,
     zIndex: 1,
     borderWidth: 2,
-    backgroundColor: '#fff',
-    borderColor: 'grey',
-    overflow: 'hidden'
+    backgroundColor: "#fff",
+    borderColor: "grey",
+    overflow: "hidden",
   },
   optionWrapper: {
     flex: 1,
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
-    paddingHorizontal: 15
+    paddingHorizontal: 15,
   },
 });
 
-export default (props) => <Context.Consumer>
-  {
-    context =>  <Maptracker {...props} context={context} />
-  }
-</Context.Consumer>;
+export default (props) => (
+  <Context.Consumer>
+    {(context) => <Maptracker {...props} context={context} />}
+  </Context.Consumer>
+);

@@ -37,28 +37,44 @@ class Driver extends Component {
   };
 
   componentDidMount() {
-    const {route: {params: {userId}}} = this.props;
-    getUser({
-      userId
-    }).then(res => {
-      if (res.status !== 200) {
-        throw 'Something went wrong';
+    this.navigationListener = this.props.navigation.addListener(
+      "focus",
+      async () => {
+        const {
+          route: {
+            params: { userId },
+          },
+        } = this.props;
+        getUser({
+          userId,
+        })
+          .then((res) => {
+            console.log('new res', res)
+            if (res.status !== 200) {
+              throw "Something went wrong";
+            }
+            const {
+              message: { address },
+            } = res;
+            this.setState({
+              houseNo: address,
+            });
+          })
+          .catch((err) => {
+            console.log("err", err);
+            Alert.alert("Error", err);
+          });
       }
-      const { message: {
-        address
-      } } = res
-      this.setState({
-        houseNo: address
-      })
-    }).catch(err => {
-      console.log('err', err)
-      Alert.alert('Error', err)
-    })
+    );
   }
 
   handleSubmit = async () => {
     await this.setState({ loading: true });
-    const {route: {params: {_id, coords}}} = this.props;
+    const {
+      route: {
+        params: { _id, coords },
+      },
+    } = this.props;
 
     const {
       type1,
@@ -76,11 +92,19 @@ class Driver extends Component {
       return Alert.alert("Validation error", "All fields are required");
     }
 
-    if (typeof +type1Amount !== 'number' || typeof +type2Amount !== 'number' || typeof +type3Amount !== 'number' || typeof +type4Amount !== 'number' ) {
+    if (
+      typeof +type1Amount !== "number" ||
+      typeof +type2Amount !== "number" ||
+      typeof +type3Amount !== "number" ||
+      typeof +type4Amount !== "number"
+    ) {
       this.setState({ loading: false });
-      return Alert.alert("Validation error", "Quantity needs to be numeric value");
-    } 
-    console.log('ab jae ga')
+      return Alert.alert(
+        "Validation error",
+        "Quantity needs to be numeric value"
+      );
+    }
+    console.log("ab jae ga");
     const response = await setMaintaince({
       houseNo,
       point: coords,
@@ -113,7 +137,7 @@ class Driver extends Component {
       type4Amount,
     } = this.state;
 
-    console.log(this.props)
+    console.log(this.props);
     return (
       <>
         <Header text="Pick Up" {...this.props} />
