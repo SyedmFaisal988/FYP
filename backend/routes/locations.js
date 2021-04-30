@@ -3,6 +3,7 @@ const crowdModal = require("../models/Crowd");
 const authenticate = require("../authenticate");
 const locationModal = require("../models/Location");
 const UserModal = require('../models/User');
+const MaintainceModal = require('../models/Maintaince');
 
 const fs = require("fs");
 
@@ -50,7 +51,9 @@ locationRouter
       const promises = formatedData.map(async (record) => {
         const data = await UserModal.findById(record.userId);
         const employeeData = await UserModal.findById(record.employeeId)
-        return [data, employeeData];
+        const maintainceData = await MaintainceModal.findById(record._id)
+        console.log(maintainceData)
+        return [data, employeeData, maintainceData];
       })
       Promise.all(promises).then((response) => {
         res.statusCode = 200;
@@ -59,7 +62,8 @@ locationRouter
           message: formatedData.map((ele, index) => ({
             ...ele,
             user: response[index][0],
-            employee: response[index][1]
+            employee: response[index][1],
+            maintainceDetails: response[index][2]
           }))
         })
       })

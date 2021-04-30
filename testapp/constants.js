@@ -1,1 +1,1 @@
-export const endpoint = false ? 'http://10.0.2.2:4000' : 'http://192.168.4.102:4000'
+export const endpoint = false ? 'http://10.0.2.2:4000' : 'http://192.168.4.105:4000'

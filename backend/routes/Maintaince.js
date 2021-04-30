@@ -26,6 +26,7 @@ maintainceRouter
       if (updatePointIndex >= 0) {
         point.processing = new Date();
         point.complete = new Date();
+        point.employeeId = req.user._id
         const updatedCords = locationData.cords;
         updatedCords[updatePointIndex] = point;
         const resp = await locationModal.findByIdAndUpdate(userId, {
@@ -50,6 +51,8 @@ maintainceRouter
           type2,
           type3,
           type4,
+          userId,
+          _id: point._id
         }).then((resp) => {
           res.json({
             status: 200,
@@ -57,7 +60,8 @@ maintainceRouter
           });
         });
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err)
         res.json({
           status: 500,
           message: "Internal server error",

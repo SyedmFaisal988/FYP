@@ -57,7 +57,7 @@ userRouter.route('/get').post(authenticate.verifyUser, authenticate.verifyEmploy
 
 userRouter.route('/login')
 .post((req, res)=>{
-    console.log('aya')
+    console.log('aya', req.body)
     passport.authenticate('local')(req, res, ()=>{
         const token = authenticate.getToken({ _id: req.user._id })
         res.statusCode = 200

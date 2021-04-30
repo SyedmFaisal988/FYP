@@ -47,6 +47,7 @@ exports.verifyAdmin = (req, res, next) => {
 
 exports.verifyEmployee = (req, res, next) => {
     const { user: { type } } = req
+    console.log(type, 'type')
     if(type !== 'EMPLOYEE'){
         res.statusCode = 401;
         res.setHeader('Content-Type', 'application/json')
