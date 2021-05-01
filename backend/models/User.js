@@ -31,6 +31,10 @@ const userSchema = new Schema({
     type: {
         type: String,
         default: 'USER'
+    },
+    pushToken: {
+        type: String,
+        default: ''
     }
 })
 

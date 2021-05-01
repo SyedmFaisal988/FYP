@@ -4,6 +4,8 @@ const authenticate = require("../authenticate");
 const locationModal = require("../models/Location");
 const UserModal = require('../models/User');
 const MaintainceModal = require('../models/Maintaince');
+const { Expo } = require('expo-server-sdk');
+let expo = new Expo();
 
 const fs = require("fs");
 
@@ -13,6 +15,32 @@ locationRouter.use(
     limit: "200mb",
   })
 );
+
+const handleSendNotification = () => {
+  const to = [];
+  UserModal.find({ type: 'EMPLOYEE' }).lean().then((res) => {
+    res.forEach(user => {
+      user.pushToken && to.push(user.pushToken);
+    })
+    let messages = [];
+  messages.push({
+    to,
+    sound: "default",
+    body: "New pickup avaliable",
+    data: { withSome: "data" },
+  });
+  let chunks = expo.chunkPushNotifications(messages);
+  const promises = chunks.map(chunk => expo.sendPushNotificationsAsync(chunk));
+  Promise.all(promises).then((resp) => console.log(resp)).catch((err) => console.log('err', err))
+  }).catch(() => {
+
+  })
+}
+
+locationRouter.route('/testNotification').get((req, res) => {
+  handleSendNotification();
+  res.json()
+})
 
 locationRouter
   .route("/uploads")
@@ -42,10 +70,12 @@ locationRouter
       const formatedData = [];
       filterData.forEach((ele) => {
         ele.cords.forEach((elem) => {
+          if (elem.employeeId) {
           formatedData.push({
             userId: ele.userId,
             ...elem._doc,
           })
+        }
         })
       })
       const promises = formatedData.map(async (record) => {
@@ -230,6 +260,7 @@ locationRouter
         );
       })
       .then((resp) => {
+        handleSendNotification();
         res.json({
           status: 200,
           message: "added successfully",

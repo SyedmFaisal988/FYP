@@ -155,7 +155,7 @@ class Driver extends Component {
             />
 
             <View style={{ marginBottom: 15 }} />
-            <Text style={styles.labelText}>Type 1</Text>
+            <Text style={styles.labelText}>Type Brown</Text>
             <InputField
               customStyle={{
                 height: 50,
@@ -166,7 +166,7 @@ class Driver extends Component {
             />
 
             <View style={{ marginBottom: 15 }} />
-            <Text style={styles.labelText}>Type 2</Text>
+            <Text style={styles.labelText}>Type Yellow</Text>
             <InputField
               customStyle={{
                 height: 50,
@@ -177,7 +177,7 @@ class Driver extends Component {
             />
 
             <View style={{ marginBottom: 15 }} />
-            <Text style={styles.labelText}>Type 3</Text>
+            <Text style={styles.labelText}>Type White</Text>
             <InputField
               customStyle={{
                 height: 50,
@@ -188,7 +188,7 @@ class Driver extends Component {
             />
 
             <View style={{ marginBottom: 15 }} />
-            <Text style={styles.labelText}>Type 4</Text>
+            <Text style={styles.labelText}>Type Green</Text>
             <InputField
               customStyle={{
                 height: 50,

@@ -21,6 +21,7 @@ import LoginButton from "../components/BigButton";
 import { Envalop, Password } from "../components/icons";
 import logo from "../assets/conceptRemake.png";
 import LoadingScreen from "../components/loader";
+import { Context } from "../context";
 
 const { height } = Dimensions.get("window");
 
@@ -34,7 +35,7 @@ class Login extends Component {
   handleLogin = async () => {
     await this.setState({ loading: true });
     const { username, password } = this.state;
-    const response = await logIn({ username, password });
+    const response = await logIn({ username, password, pushToken: this.props.context.expoPushToken });
     if (response.success) {
       AsyncStorage.setItem(
         "token",
@@ -51,6 +52,7 @@ class Login extends Component {
 
   render() {
     const { username, password, loading } = this.state;
+    console.log({props: this.props})
     return (
       <ScrollView>
         <StatusBar backgroundColor="black" barStyle="light-content" />
@@ -127,6 +129,12 @@ class Login extends Component {
   }
 }
 
+export default (props) => (
+  <Context.Consumer>
+    {(context) => <Login {...props} context={context} />}
+  </Context.Consumer>
+);
+
 const styles = StyleSheet.create({
   logoContainer: {
     flex: 0.35,
@@ -182,4 +190,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Login;
+// export default Login;

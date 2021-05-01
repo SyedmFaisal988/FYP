@@ -9,5 +9,5 @@ export default ({ parentProps: { navigation: { dispatch, navigate } } }) => {
             navigate('unAuthorizeNavigator')
         })
     }, [])
-    return (<Loader loading={true} />)
+    return null
 }

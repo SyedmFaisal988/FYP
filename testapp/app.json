@@ -27,7 +27,14 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.testapp.testapp"
+      "package": "com.testapp.testapp",
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 1,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyB_jvqzflb9DK31FKtKSr62sT1QRNa6k00"
+        }
+      }
     }
   }
 }

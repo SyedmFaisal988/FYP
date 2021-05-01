@@ -7,7 +7,6 @@ import { StackActions, NavigationActions } from 'react-navigation'
 export default Start = (props) => {
     AsyncStorage.getItem("token")
         .then(async (token) => {
-            console.log({ token })
             if (token) {
                 const response = await check()
                 if (response.success) {

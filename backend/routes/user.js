@@ -60,6 +60,7 @@ userRouter.route('/login')
     console.log('aya', req.body)
     passport.authenticate('local')(req, res, ()=>{
         const token = authenticate.getToken({ _id: req.user._id })
+        User.findByIdAndUpdate(req.user._id, {pushToken: req.body.pushToken}).then(resp => console.log('done ha'))
         res.statusCode = 200
         return res.json({ token: token, success: true, isAdmin: req.user.isadmin })
     })

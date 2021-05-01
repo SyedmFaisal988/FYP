@@ -51,7 +51,6 @@ class Maptracker extends Component {
         });
       });
     });
-    console.log({newData})
     return newData;
   };
   onRegionChange = (mapRegion) => {
@@ -87,8 +86,8 @@ class Maptracker extends Component {
     this.navigationListener = this.props.navigation.addListener(
       "focus",
       async () => {
+        console.log('chaal')
         const data = await getLocationData();
-        console.log(data);
         const formatedData = this.mapData(data);
         this.setState({ imageMarker: formatedData, displayData: formatedData });
         for (var i = 0; i < formatedData.length; i++) {
@@ -126,7 +125,6 @@ class Maptracker extends Component {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         });
-        console.log(false);
         return this.setState({ loading: false });
       }
     );
@@ -277,7 +275,6 @@ class Maptracker extends Component {
       context: { mapRegion },
     } = this.props;
     let data = ["All", "Pending", "Processing", "Solved"];
-    console.log(displayData)
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <Header

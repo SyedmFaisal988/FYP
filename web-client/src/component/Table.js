@@ -105,13 +105,13 @@ const Table = () => {
     { title: "Description", field: "description" },
     { title: "Employee", field: 'employee'},
     {title: 'Date', field: 'date'},
-    {title: 'Type1', field: 'type1'},
-    {title: 'Type2', field: 'type2'},
-    {title: 'Type3', field: 'type3'},
-    {title: 'Type4', field: 'type4'},
+    {title: 'Brown', field: 'type1'},
+    {title: 'Yellow', field: 'type2'},
+    {title: 'White', field: 'type3'},
+    {title: 'Green', field: 'type4'},
   ];
   return (
-    <div>
+    <div style={{ marginRight: 10, marginLeft: 10 }}>
       {/* <div> */}
         <FormControl className={classes.formControl}>
           <InputLabel id="demo-simple-select-label">User</InputLabel>
@@ -194,28 +194,28 @@ const Table = () => {
             <List>
               <ListItem>
                 <ListItemText
-                  primary={`Type 1:  ${filterData.reduce((acc, next) => {
+                  primary={`Type Brown:  ${filterData.reduce((acc, next) => {
                     return acc += +next.type1
                   }, 0)}`}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={`Type 2:  ${filterData.reduce((acc, next) => {
+                  primary={`Type Yellow:  ${filterData.reduce((acc, next) => {
                     return acc += +next.type2
                   }, 0)}`}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={`Type 3:  ${filterData.reduce((acc, next) => {
+                  primary={`Type White:  ${filterData.reduce((acc, next) => {
                     return acc += +next.type3
                   }, 0)}`}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={`Type 4:  ${filterData.reduce((acc, next) => {
+                  primary={`Type Green:  ${filterData.reduce((acc, next) => {
                     return acc += +next.type4
                   }, 0)}`}
                 />

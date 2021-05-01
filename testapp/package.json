@@ -18,6 +18,7 @@
     "expo-image-picker": "~8.1.0",
     "expo-linear-gradient": "~8.1.0",
     "expo-location": "~8.1.0",
+    "expo-notifications": "~0.1.1",
     "expo-permissions": "~8.1.0",
     "expo-sensors": "~8.1.0",
     "expo-task-manager": "~8.1.0",

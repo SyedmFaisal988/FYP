@@ -20,7 +20,7 @@ maintainceRouter
       const locationData = await locationModal.findById(userId).lean();
       console.log(locationData.cords[0], locationData.cords[0]._id, JSON.stringify(locationData.cords[0]._id).replace(/"/g,''), 'ASD')
       const updatePointIndex = locationData.cords.findIndex(
-        (ele) => JSON.stringify(locationData.cords[0]._id).replace(/"/g,'') === point._id
+        (ele, index) => JSON.stringify(locationData.cords[index]._id).replace(/"/g,'') === point._id
       );
       console.log('index', updatePointIndex)
       if (updatePointIndex >= 0) {
