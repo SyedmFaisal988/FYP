@@ -163,12 +163,12 @@ const styles = StyleSheet.create({
     marginRight: 35,
   },
   logoWrapper: {
-    height: 100,
-    width: 100,
+    height: 150,
+    width: 150,
     padding: 7,
     borderColor: "#fff",
-    borderWidth: 5,
-    borderRadius: 50,
+    // borderWidth: 5,
+    // borderRadius: 50,
   },
   headerText: {
     fontWeight: "bold",

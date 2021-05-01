@@ -2,7 +2,7 @@ import React from 'react'
 import { Modal, Image, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 
-const splash = require('../assets/icon.png')
+const splash = require('../assets/conceptRemake.png')
 
 export default loader = ({loading}) => (
     <Modal
