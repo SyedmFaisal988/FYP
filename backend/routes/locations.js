@@ -28,6 +28,7 @@ const handleSendNotification = () => {
     sound: "default",
     body: "New pickup avaliable",
     data: { withSome: "data" },
+    priority: 'high'
   });
   let chunks = expo.chunkPushNotifications(messages);
   const promises = chunks.map(chunk => expo.sendPushNotificationsAsync(chunk));

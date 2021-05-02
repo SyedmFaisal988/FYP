@@ -21,7 +21,7 @@ import { Context } from "../context";
 class Maptracker extends Component {
   state = {
     test: false,
-    filter: "all",
+    filter: "pending",
     loading: true,
     displayData: [],
     imageMarker: [],
@@ -73,7 +73,8 @@ class Maptracker extends Component {
       const base64data = fileReaderInstance.result;
       let imageMarker = JSON.parse(JSON.stringify(this.state.imageMarker));
       imageMarker[index].uri = base64data;
-      this.setState({ imageMarker, displayData: imageMarker });
+      this.setState({ imageMarker });
+      this.onChangeFilter(this.state.filter, imageMarker);
     };
   };
 
@@ -242,9 +243,10 @@ class Maptracker extends Component {
     this.setState({ filterModalOpen: open });
   };
 
-  onChangeFilter = (value) => {
+  onChangeFilter = (value, newState) => {
     const filter = value.toLowerCase();
-    const { imageMarker } = this.state;
+    const { imageMarker: data } = this.state;
+    const imageMarker = newState || data;
     let displayData = [];
     switch (filter) {
       case "all":
@@ -287,6 +289,7 @@ class Maptracker extends Component {
         {mapRegion ? (
           <MapView
             key="-1"
+            onPress={() => this.setState({ filterModalOpen: false })}
             initialRegion={this.coordinate[0]}
             onRegionChange={(data) => this.onRegionChange(data)}
             style={{ flex: 1, zIndex: -1 }}
@@ -361,7 +364,7 @@ class Maptracker extends Component {
                 style={styles.optionWrapper}
               >
                 <>
-                  <Text style={styles.optionText}>{ele}</Text>
+                  <Text style={[styles.optionText, filter === ele.toLowerCase() ? styles.optionTextColored : null]}>{ele}</Text>
                   <Check
                     style={{
                       display:
@@ -374,6 +377,11 @@ class Maptracker extends Component {
               </TouchableOpacity>
             </View>
           ))}
+          {displayData.map((ele) => <Image
+                        style={{ height: 0, width: 0 }}
+                        resizeMode="contain"
+                        source={{ uri: ele.uri }}
+                      />)}
         </View>
       </SafeAreaView>
     );
@@ -393,11 +401,14 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 17,
   },
+  optionTextColored: {
+    color: '#f15e00'
+  },  
   optionContainer: {
     position: "absolute",
     width: 200,
     height: 160,
-    left: 212,
+    right: 0,
     top: 65,
     zIndex: 1,
     borderWidth: 2,
