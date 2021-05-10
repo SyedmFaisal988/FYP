@@ -83,6 +83,24 @@ userRouter.route('/login-admin').post((req, res)=>{
     })
 })
 
+userRouter.route('/logout').get(authenticate.verifyUser, (req, res) => {
+    const { user: { _id } } = req;
+    User.findByIdAndUpdate(_id, { pushToken: '' }).then(() => {
+        res.statusCode = 200
+        res.setHeader('Content-Type', 'application/json')
+        res.json({
+            success: true,
+        })
+    }).catch(() => {
+        res.statusCode = 500
+        res.setHeader('Content-Type', 'application/json')
+        res.json({
+            success: false
+        })
+    });
+    
+})
+
 userRouter.route('/check').get(authenticate.verifyUser, (req, res)=>{
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json')

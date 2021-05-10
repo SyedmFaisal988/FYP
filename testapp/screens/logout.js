@@ -1,13 +1,25 @@
-import React, { useEffect } from 'react'
-import { AsyncStorage } from 'react-native'
-import Loader from '../components/loader'
+import { logout } from '../api';
+import Loader from '../components/loader';
+import { Alert, AsyncStorage } from 'react-native';
+import React, { useEffect, useState } from 'react';
 
-export default ({ parentProps: { navigation: { dispatch, navigate } } }) => {
+export default ({ parentProps: { navigation: { dispatch, navigate, pop } } }) => {
+    const [loading, setLoading] = useState(true)
 
     useEffect(()=> {
-        AsyncStorage.removeItem('token').then(()=>{
-            navigate('unAuthorizeNavigator')
+        logout().then((resp) => {
+            if (resp.success) {
+                AsyncStorage.removeItem('token').then(()=>{
+                    setLoading(false)
+                    navigate('unAuthorizeNavigator')
+                })
+            } else {
+                throw "";
+            }
+        }).catch(() => {
+            setLoading(false)
+            Alert.alert('Something went wrong');
         })
     }, [])
-    return null
+    return <Loader loading={loading} />
 }

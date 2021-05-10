@@ -52,4 +52,11 @@ const signup = async (inputData) => {
     return response.json()
 }
 
-export { logIn, check, signup, getUser }
+const logout = async () => {
+    const url = `${endpoint}/users/logout`
+    const headers = await setHeader("GET");
+    const response = await fetch(url, headers)
+    return response.json()
+}
+
+export { logIn, check, signup, getUser, logout }
