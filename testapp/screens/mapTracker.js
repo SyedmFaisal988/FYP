@@ -17,6 +17,7 @@ import { getLocationData } from "../api";
 import { endpoint } from "../constants";
 import { Check } from "../components/icons";
 import { Context } from "../context";
+import { setImageUrl } from "../utils/setHeader";
 
 class Maptracker extends Component {
   state = {
@@ -45,7 +46,7 @@ class Maptracker extends Component {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           },
-          uri: `${endpoint}/images/${ele.image}`,
+          uri: setImageUrl(ele.image),
           userId: message.userId,
           _id: message._id,
         });

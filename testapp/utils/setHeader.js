@@ -1,4 +1,5 @@
 import { AsyncStorage } from "react-native"
+import { imageEndPoint } from "../constants"
 
 export const setHeader = async (method, body)=>{
     const token = (await AsyncStorage.getItem('token')).replace(/"/g, '')
@@ -11,4 +12,8 @@ export const setHeader = async (method, body)=>{
         },
         ...body
     }
+}
+
+export const setImageUrl = (uri) => {
+    return `${imageEndPoint}/${uri}?alt=media`;
 }

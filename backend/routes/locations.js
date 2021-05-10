@@ -1,13 +1,22 @@
+const { Expo } = require('expo-server-sdk');
+let expo = new Expo();
+const fs = require("fs");
 const express = require("express");
+const admin = require('firebase-admin');
+const UserModal = require('../models/User');
 const crowdModal = require("../models/Crowd");
 const authenticate = require("../authenticate");
 const locationModal = require("../models/Location");
-const UserModal = require('../models/User');
 const MaintainceModal = require('../models/Maintaince');
-const { Expo } = require('expo-server-sdk');
-let expo = new Expo();
 
-const fs = require("fs");
+var serviceAccount = require('../serviceAccountKey.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  storageBucket: "fyp-2020-299916.appspot.com"
+});
+
+const bucket = admin.storage().bucket();
 
 const locationRouter = express.Router();
 locationRouter.use(
@@ -39,8 +48,13 @@ const handleSendNotification = () => {
 }
 
 locationRouter.route('/testNotification').get((req, res) => {
-  handleSendNotification();
-  res.json()
+  const filepath = `./images/1609090502929.jpg`;
+  console.log({filepath})
+  bucket.upload(filepath, {
+    destination: 'file.jpg',
+  }).then((resp) => {
+    res.json(resp)
+  }).catch(res.json)
 })
 
 locationRouter
@@ -241,6 +255,25 @@ locationRouter
       promises.push(fs.writeFileSync(`./images/${name}`, base64Data, "base64"));
     });
     Promise.all(promises)
+      .then(() => {
+        const newPromises = [bucket.upload(`./images/${coverName}`, {
+          destination: coverName,
+        })];
+        attachmentsName.forEach((name) => {
+          newPromises.push(bucket.upload(`./images/${name}`, {
+            destination: name
+          }))
+        })
+        return Promise.all(newPromises)
+      })
+      .then(() => {
+        const unLinkPromises = [];
+        unLinkPromises.push(fs.unlinkSync(`./images/${coverName}`))
+        attachmentsName.forEach((name) => {
+          newPromises.push(fs.unlinkSync(`./images/${name}`))
+        })
+        return Promise.all(unLinkPromises);
+      })
       .then(() => {
         return locationModal.findOneAndUpdate(
           { userId: req.user._id },
