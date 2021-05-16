@@ -62,7 +62,7 @@ userRouter.route('/login')
         const token = authenticate.getToken({ _id: req.user._id })
         User.findByIdAndUpdate(req.user._id, {pushToken: req.body.pushToken}).then(resp => console.log('done ha'))
         res.statusCode = 200
-        return res.json({ token: token, success: true, isAdmin: req.user.isadmin })
+        return res.json({ token: token, success: true, isAdmin: req.user.isadmin, message: req.user })
     })
   
 })
@@ -104,7 +104,7 @@ userRouter.route('/logout').get(authenticate.verifyUser, (req, res) => {
 userRouter.route('/check').get(authenticate.verifyUser, (req, res)=>{
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json')
-    res.json({ success: true })
+    res.json({ success: true, message: req.user })
 })
 
 module.exports = userRouter

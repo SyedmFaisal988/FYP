@@ -44,7 +44,9 @@ class Login extends Component {
       AsyncStorage.setItem('user', JSON.stringify(response));
       console.log('response', response)
       await this.setState({ loading: false, username: "", password: "" });
-      return this.props.navigation.navigate("authorizeNavigator");
+      return this.props.navigation.navigate("authorizeNavigator", {
+        user: response.message
+      });
     }
     await this.setState({ loading: false });
     return Alert.alert("Ops", "Invalid User name or password");

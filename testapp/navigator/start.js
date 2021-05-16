@@ -9,10 +9,14 @@ export default Start = (props) => {
         .then(async (token) => {
             if (token) {
                 const response = await check()
+                console.log('res', response)
                 if (response.success) {
+                    await AsyncStorage.setItem('user', JSON.stringify(response.message));
                     const resetAction = StackActions.reset({
                         index: 0,
-                        actions: [NavigationActions.navigate({ routeName: "authorizeNavigator" })],
+                        actions: [NavigationActions.navigate({ routeName: "authorizeNavigator", params: {
+                            user: response.message
+                        } })],
                     })
                     return props.navigation.dispatch(resetAction)
                 }
@@ -25,6 +29,7 @@ export default Start = (props) => {
             return props.navigation.dispatch(resetAction)
         })
         .catch(err => {
+            console.log('err', err)
             const resetAction = StackActions.reset({
                 index: 0,
                 actions: [NavigationActions.navigate({ routeName: "unAuthorizeNavigator" })],
