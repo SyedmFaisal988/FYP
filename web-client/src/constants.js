@@ -1,1 +1,1 @@
-export const REST_API = 'http://192.168.4.105:4000'
+export const REST_API = true ? 'https://fyp-2020-eco.herokuapp.com' : 'http://192.168.4.105:4000'
